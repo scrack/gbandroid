@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <string name="application_name">MobileSpy</string>
+
+	<string name="login_user">User</string>
+	<string name="login_user_value"></string>
+    <string name="login_password">Password</string>
+    <string name="login_password_value"></string>
+    <string name="login_cancel">Cancel</string>
+    <string name="login_login">Login</string>
+
+</resources>
