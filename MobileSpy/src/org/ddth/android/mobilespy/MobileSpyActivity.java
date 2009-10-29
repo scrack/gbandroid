@@ -12,12 +12,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 public class MobileSpyActivity extends Activity implements ContentHandler {
-	/**
-	 * Flag to prohibit continuous clicking on
-	 * login button. 
-	 */
-	private boolean isRequesting = false;
-	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -32,10 +26,8 @@ public class MobileSpyActivity extends Activity implements ContentHandler {
 		login.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if (isRequesting) {
-					Toast.makeText(MobileSpyActivity.this, "Please wait...", Toast.LENGTH_SHORT).show();
-					return;
-				}
+				// Prohibit continuous clicking on login button. 
+				findViewById(R.id.login).setEnabled(false);
 				SharedPreferences.Editor editor = settings.edit();
 				editor.putString(MobileSpy.USERNAME_FIELD, username.getText().toString());
 				editor.putString(MobileSpy.PASSWORD_FIELD, password.getText().toString());
@@ -44,7 +36,6 @@ public class MobileSpyActivity extends Activity implements ContentHandler {
 				MobileSpy.login(MobileSpyActivity.this,
 					username.getText().toString(),
 					password.getText().toString());
-				isRequesting = true;				
 			}
 		});
 
@@ -64,7 +55,15 @@ public class MobileSpyActivity extends Activity implements ContentHandler {
 
 	@Override
 	public void handle(final String text) {
-		isRequesting = false;
+		// Enable login button
+		runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				// This must be run within UI thread
+				findViewById(R.id.login).setEnabled(true);
+			}
+		});
+		
 		if (text != null) {
 			// Notify error which is specified in the given text
 			runOnUiThread(new Runnable() {

