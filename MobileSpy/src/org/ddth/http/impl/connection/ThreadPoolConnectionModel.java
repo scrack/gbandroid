@@ -233,17 +233,8 @@ public class ThreadPoolConnectionModel implements ConnectionModel {
 				}
 			}
 			else {
-				List <NameValuePair> nvps = new ArrayList<NameValuePair>();
-				
-				Map<String, String> parameters = request.getParameters();
-				Iterator<String> iterator = parameters.keySet().iterator();
-				while (iterator.hasNext()) {
-					String parameter = iterator.next();
-					String value = parameters.get(parameter);
-					nvps.add(new BasicNameValuePair(parameter, value));
-				}
 				try {
-					httpPost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
+					createSimplePostRequest(httpPost, request);
 				}
 				catch (UnsupportedEncodingException e) {
 					logger.error("Create a POST HTTP request failed.", e);
@@ -262,19 +253,35 @@ public class ThreadPoolConnectionModel implements ConnectionModel {
 		return httpRequest;
 	}
 
+	private void createSimplePostRequest(HttpPost httpPost, final Request request)
+		throws UnsupportedEncodingException
+	{
+		Map<String, String> parameters = request.getParameters();
+		Iterator<String> iterator = parameters.keySet().iterator();
+		List <NameValuePair> nvps = new ArrayList<NameValuePair>();
+		while (iterator.hasNext()) {
+			String parameter = iterator.next();
+			String value = parameters.get(parameter);
+			nvps.add(new BasicNameValuePair(parameter, value));
+		}
+		httpPost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
+	}
+
 	
-	public void createUploadFileRequest(HttpPost httpPost, HttpMultipartRequest request) throws IOException {
+	private void createUploadFileRequest(HttpPost httpPost, HttpMultipartRequest request) throws IOException {
 		Map<String, String> parameters = request.getParameters();
 		Iterator<String> iterator = parameters.keySet().iterator();
 		List<Part> parts = new ArrayList<Part>();
 		while (iterator.hasNext()) {
 			String parameter = iterator.next();
 			String value = parameters.get(parameter);
-			parts.add(new StringPart(parameter, value));
+			if (value != null) {
+				parts.add(new StringPart(parameter, value));
+			}
+			else {
+				parts.add(new FilePart(parameter, request.getFile()));
+			}
 		}
-		
-		parts.add(new FilePart(request.getFieldName(), request.getFile()));
-		
 		httpPost.setEntity(new MultipartEntity(parts.toArray(new Part[parts.size()]), httpPost.getParams()));
 		httpPost.addHeader("Connection", "Keep-Alive");
 	}
