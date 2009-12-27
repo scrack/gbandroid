@@ -21,4 +21,8 @@ public class Logger {
 		Log.i("MobileSpyService", message);
 	}
 
+	public void trace(String message) {
+		Log.d("MobileSpyService", message);
+	}
+
 }
