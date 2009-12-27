@@ -20,7 +20,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.zip.GZIPInputStream;
 
-
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -56,7 +55,12 @@ import org.ddth.http.core.connection.ConnectionModel;
 import org.ddth.http.core.connection.Request;
 import org.ddth.http.core.connection.RequestFuture;
 import org.ddth.http.core.connection.Response;
+import org.ddth.http.impl.connection.multipart.FilePart;
+import org.ddth.http.impl.connection.multipart.MultipartEntity;
+import org.ddth.http.impl.connection.multipart.Part;
+import org.ddth.http.impl.connection.multipart.StringPart;
 import org.ddth.http.impl.content.WebpageContent;
+
 
 public class ThreadPoolConnectionModel implements ConnectionModel {
 	private Logger logger = Logger.getDefault();
@@ -220,20 +224,30 @@ public class ThreadPoolConnectionModel implements ConnectionModel {
 		HttpUriRequest httpRequest = null;
 		if (request.isPostRequest()) {
 			HttpPost httpPost = new HttpPost(request.getURL());
-			List <NameValuePair> nvps = new ArrayList<NameValuePair>();
-			
-			Map<String, String> parameters = request.getParameters();
-			Iterator<String> iterator = parameters.keySet().iterator();
-			while (iterator.hasNext()) {
-				String parameter = iterator.next();
-				String value = parameters.get(parameter);
-				nvps.add(new BasicNameValuePair(parameter, value));
+			if (request instanceof HttpMultipartRequest) {
+				try {
+					createUploadFileRequest(httpPost, (HttpMultipartRequest) request);
+				}
+				catch (IOException e) {
+					logger.error("Error when creating multipart file upload", e);
+				}
 			}
-			try {
-				httpPost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
-			}
-			catch (UnsupportedEncodingException e) {
-				logger.error("Create an HTTP request failed.", e);
+			else {
+				List <NameValuePair> nvps = new ArrayList<NameValuePair>();
+				
+				Map<String, String> parameters = request.getParameters();
+				Iterator<String> iterator = parameters.keySet().iterator();
+				while (iterator.hasNext()) {
+					String parameter = iterator.next();
+					String value = parameters.get(parameter);
+					nvps.add(new BasicNameValuePair(parameter, value));
+				}
+				try {
+					httpPost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
+				}
+				catch (UnsupportedEncodingException e) {
+					logger.error("Create a POST HTTP request failed.", e);
+				}
 			}
 			httpRequest = httpPost;
 		}
@@ -246,6 +260,23 @@ public class ThreadPoolConnectionModel implements ConnectionModel {
 		httpRequest.addHeader("Referer", request.getURL());
 		httpRequest.addHeader("Accept-Encoding", "gzip");
 		return httpRequest;
+	}
+
+	
+	public void createUploadFileRequest(HttpPost httpPost, HttpMultipartRequest request) throws IOException {
+		Map<String, String> parameters = request.getParameters();
+		Iterator<String> iterator = parameters.keySet().iterator();
+		List<Part> parts = new ArrayList<Part>();
+		while (iterator.hasNext()) {
+			String parameter = iterator.next();
+			String value = parameters.get(parameter);
+			parts.add(new StringPart(parameter, value));
+		}
+		
+		parts.add(new FilePart(request.getFieldName(), request.getFile()));
+		
+		httpPost.setEntity(new MultipartEntity(parts.toArray(new Part[parts.size()]), httpPost.getParams()));
+		httpPost.addHeader("Connection", "Keep-Alive");
 	}
 
 	protected void printHeader(Header[] headers) {
