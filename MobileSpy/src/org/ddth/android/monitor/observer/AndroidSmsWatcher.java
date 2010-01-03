@@ -109,13 +109,13 @@ public class AndroidSmsWatcher<T extends SmsReporter> extends SmsWatcher<T> impl
 			if (protocol != null || type != MESSAGE_TYPE_SENT) {
 				return sms;
 			}
-    		int dateColumn = cursor.getColumnIndex("date");
-    		int bodyColumn = cursor.getColumnIndex("body");
-    		int addressColumn = cursor.getColumnIndex("address");
+			int dateColumn = cursor.getColumnIndex("date");
+			int bodyColumn = cursor.getColumnIndex("body");
+			int addressColumn = cursor.getColumnIndex("address");
 
-    		String from = "0";
-    		String to = cursor.getString(addressColumn);
-    		Date now = new Date(cursor.getLong(dateColumn));
+			String from = "0";
+			String to = cursor.getString(addressColumn);
+			Date now = new Date(cursor.getLong(dateColumn));
 			String message = cursor.getString(bodyColumn);
 			sms = new SMS(from, to, message, now);
 		}
