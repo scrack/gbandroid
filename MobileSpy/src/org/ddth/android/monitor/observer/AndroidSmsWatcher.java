@@ -5,10 +5,8 @@ import java.util.Date;
 import org.ddth.android.monitor.core.AndroidReceiver;
 import org.ddth.http.core.Logger;
 import org.ddth.mobile.monitor.core.DC;
-import org.ddth.mobile.monitor.core.Watcher;
-import org.ddth.mobile.monitor.observer.sms.SmsReporter;
-import org.ddth.mobile.monitor.observer.sms.SmsWatcher;
-import org.ddth.mobile.monitor.observer.sms.SmsReporter.SMS;
+import org.ddth.mobile.monitor.core.WatcherAdapter;
+import org.ddth.mobile.monitor.report.SMS;
 
 import android.content.Context;
 import android.content.Intent;
@@ -23,7 +21,7 @@ import android.telephony.gsm.SmsMessage;
  *
  * @param <T>
  */
-public class AndroidSmsWatcher<T extends SmsReporter> extends SmsWatcher<T> implements AndroidReceiver {
+public class AndroidSmsWatcher extends WatcherAdapter<SMS> implements AndroidReceiver {
 	
 	public static final String ACTION_SMS_RECEIVED = "android.provider.Telephony.SMS_RECEIVED";
 	public static final String ACTION_NEW_OUTGOING_SMS = "android.provider.Telephony.NEW_OUTGOING_SMS";
@@ -42,31 +40,28 @@ public class AndroidSmsWatcher<T extends SmsReporter> extends SmsWatcher<T> impl
 	}
 
 	@Override
-	public void watch(DC dc, int state) {
-		super.watch(dc, state);
-		
-		if (observer != null && state == Watcher.START_MONITORING) {
-			return;
-		}
-		
+	public void start(DC dc) {
+		super.start(dc);
 		// Because current Android SDK doesn't support broadcast receiver for
 		// outgoing SMS events, we should monitor the sms inbox by registering
 		// a content observer to the ContentResolver.
-		registerContentObserver(dc, state);
+		registerContentObserver(dc);
 	}
 
+	@Override
+	public void stop(DC dc) {
+		super.stop(dc);
+		Context context = (Context) dc.getPlatformContext();
+		context.getContentResolver().unregisterContentObserver(observer);
+	}
+	
 	/**
 	 * Register an observer for listening outgoing sms events.
 	 *  
 	 * @param dc
-	 * @param state
 	 */
-	private void registerContentObserver(DC dc, int state) {
+	private void registerContentObserver(DC dc) {
 		final Context context = (Context) dc.getPlatformContext();
-		if (state == Watcher.STOP_MONITORING) {
-			context.getContentResolver().unregisterContentObserver(observer);
-			return;
-		}
 		observer = new ContentObserver(null) {
 			public void onChange(boolean selfChange) {
 				SMS sms = getSMS(context);
@@ -79,7 +74,7 @@ public class AndroidSmsWatcher<T extends SmsReporter> extends SmsWatcher<T> impl
 	}
 
 	@Override
-	protected SMS parse(Object observable) {
+	protected SMS getReport(Object observable) {
 		if (observable instanceof SMS) {
 			return (SMS)observable;
 		}
