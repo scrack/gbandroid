@@ -3,20 +3,6 @@ package org.ddth.mobile.monitor.core;
 public interface Tracker<T extends Executor> extends Observer {
 
 	/**
-	 * Start monitoring
-	 *   
-	 * @param context
-	 */
-	void start(Object context);
-	
-	/**
-	 * Stop monitoring
-	 *   
-	 * @param context
-	 */
-	void stop(Object context);
-	
-	/**
 	 * Add a executor to this watcher. Client should be
 	 * aware of number of executors supported in order
 	 * to register properly.

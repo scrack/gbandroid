@@ -1,22 +1,30 @@
 package org.ddth.android.spy;
 
+import java.util.Date;
+
 import org.ddth.android.monitor.observer.AndroidSmsWatcher;
-import org.ddth.mobile.monitor.core.Watcher;
-import org.ddth.mobile.monitor.observer.sms.SmsReporter;
+import org.ddth.mobile.monitor.core.Reporter;
+import org.ddth.mobile.monitor.report.SMS;
 
 public class SmsSpy {
 
 	public void spy() {
-		AndroidSmsWatcher<SmsSpyReporter> watcher = new AndroidSmsWatcher<SmsSpyReporter>();
-		watcher.register(new SmsSpyReporter());
-		watcher.watch(null, Watcher.START_MONITORING);
+		AndroidSmsWatcher watcher = new AndroidSmsWatcher();
+		watcher.register(new SmsSpyReporter<SMS>());
+		watcher.start(null);
 	}
 }
 
-class SmsSpyReporter extends SmsReporter {
+class SMSE extends SMS {
+	public SMSE(String from, String to, String message, Date date) {
+		super(from, to, message, date);
+	}
+}
+
+class SmsSpyReporter<T extends SMS> implements Reporter<T> {
 
 	@Override
-	public void report(SMS sms) {
+	public void report(T sms) {
 		
 	}
 }

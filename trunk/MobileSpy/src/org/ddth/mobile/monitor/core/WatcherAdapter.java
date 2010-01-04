@@ -1,27 +1,42 @@
 package org.ddth.mobile.monitor.core;
 
-public abstract class WatcherAdapter<T extends Reporter> implements Watcher<T> {
-	protected T reporter;
+
+public abstract class WatcherAdapter<T extends Report> implements Watcher<T> {
+	protected Reporter<T> reporter;
 
 	@Override
-	public void watch(DC dc, int state) {
+	public void start(DC dc) {
 		Watchdog watchdog = dc.getWatchdog();
-		if (state == Watcher.START_MONITORING) {
-			watchdog.register(this);
-		}
-		else {
-			watchdog.unregister(this);
-		}
+		watchdog.register(this);
 	}
 	
 	@Override
-	public void register(T reporter) {
+	public void stop(DC dc) {
+		Watchdog watchdog = dc.getWatchdog();
+		watchdog.unregister(this);
+	}
+	
+	/**
+	 * @param observable
+	 * @return
+	 */
+	protected abstract T getReport(Object observable);
+	
+	@Override
+	public void observed(Object observable) {
+		T report = getReport(observable);
+		if (report != null) {
+			reporter.report(report);
+		}
+	}
+
+	@Override
+	public void register(Reporter<T> reporter) {
 		this.reporter = reporter;
 	}
 
 	@Override
-	public boolean unregister(T reporter) {
-		this.reporter = null;
+	public boolean unregister(Reporter<T> reporter) {
 		return false;
 	}
 }
