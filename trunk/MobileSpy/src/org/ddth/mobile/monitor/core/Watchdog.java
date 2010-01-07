@@ -3,7 +3,7 @@ package org.ddth.mobile.monitor.core;
 /**
  * @author khoanguyen
  */
-public interface Watchdog {
+public interface Watchdog extends Observer {
 
 	/**
 	 * @param observer

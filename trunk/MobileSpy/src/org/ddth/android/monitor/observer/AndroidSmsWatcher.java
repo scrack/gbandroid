@@ -2,10 +2,9 @@ package org.ddth.android.monitor.observer;
 
 import java.util.Date;
 
-import org.ddth.android.monitor.core.AndroidReceiver;
+import org.ddth.android.monitor.core.AndroidDC;
 import org.ddth.http.core.Logger;
 import org.ddth.mobile.monitor.core.DC;
-import org.ddth.mobile.monitor.core.WatcherAdapter;
 import org.ddth.mobile.monitor.report.SMS;
 
 import android.content.Context;
@@ -19,9 +18,8 @@ import android.telephony.gsm.SmsMessage;
 /**
  * @author khoanguyen
  *
- * @param <T>
  */
-public class AndroidSmsWatcher extends WatcherAdapter<SMS> implements AndroidReceiver {
+public class AndroidSmsWatcher extends AndroidWatcher {
 	
 	public static final String ACTION_SMS_RECEIVED = "android.provider.Telephony.SMS_RECEIVED";
 	public static final String ACTION_NEW_OUTGOING_SMS = "android.provider.Telephony.NEW_OUTGOING_SMS";
@@ -51,8 +49,13 @@ public class AndroidSmsWatcher extends WatcherAdapter<SMS> implements AndroidRec
 	@Override
 	public void stop(DC dc) {
 		super.stop(dc);
-		Context context = (Context) dc.getPlatformContext();
+		Context context = ((AndroidDC) dc).getContext();
 		context.getContentResolver().unregisterContentObserver(observer);
+	}
+
+	@Override
+	public void service(AndroidDC dc, Intent intent) {
+		readFromIncomingSMS(intent);
 	}
 	
 	/**
@@ -60,30 +63,19 @@ public class AndroidSmsWatcher extends WatcherAdapter<SMS> implements AndroidRec
 	 *  
 	 * @param dc
 	 */
-	private void registerContentObserver(DC dc) {
-		final Context context = (Context) dc.getPlatformContext();
+	private void registerContentObserver(final DC dc) {
+		final Context context = ((AndroidDC) dc).getContext();
 		observer = new ContentObserver(null) {
 			public void onChange(boolean selfChange) {
-				SMS sms = getSMS(context);
+				SMS sms = readFromOutgoingSMS(context);
 				// Get super class notified
-				observed(sms);
+				observed(dc, sms);
 			}
 		};
 		context.getContentResolver().registerContentObserver(
 			Uri.parse(CONTENT_SMS), true, observer);
 	}
 
-	@Override
-	protected SMS getReport(Object observable) {
-		if (observable instanceof SMS) {
-			return (SMS)observable;
-		}
-		if (observable instanceof Intent) {
-			return createSMS((Intent)observable);
-		}
-		return null;
-	}
-	
 	/**
 	 * This is invoked directly from the SMS observer to wrap the outgoing SMS.
 	 * A more elegant method would be firing an intent to the BroadcastReceiver
@@ -92,7 +84,7 @@ public class AndroidSmsWatcher extends WatcherAdapter<SMS> implements AndroidRec
 	 * @see #registerContentObserver(DC, int)
 	 * @param context
 	 */
-	private SMS getSMS(Context context) {
+	private SMS readFromOutgoingSMS(Context context) {
 		Cursor cursor = context.getContentResolver().query(
 				Uri.parse(CONTENT_SMS), null, null, null, null);
 		SMS sms = null;
@@ -123,7 +115,7 @@ public class AndroidSmsWatcher extends WatcherAdapter<SMS> implements AndroidRec
 	 * @param intent
 	 * @return an SMS message
 	 */
-	private SMS createSMS(Intent intent) {
+	private SMS readFromIncomingSMS(Intent intent) {
 		SmsMessage msg[] = getMessagesFromIntent(intent);
 		SMS sms = null;
 		for (int i = 0; i < msg.length; i++) {

@@ -1,5 +1,7 @@
 package org.ddth.android.monitor;
 
+import org.ddth.android.monitor.core.AndroidDC;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -11,17 +13,18 @@ import android.content.Intent;
  * @author khoanguyen
  */
 public abstract class AndroidBroadcastReceiver extends BroadcastReceiver {
-	/**
-	 * Get the implementation class of the {@link AndroidWatchdogService} class.
-	 * 
-	 * @return
-	 */
-	protected abstract Class<AndroidWatchdogService> getWatchdogServiceClass();
 	
-	public void onReceive(Context context, Intent intent) {
-		// Start the watchdog service to handle this event
-		Intent service = new Intent(context, getWatchdogServiceClass());
-		service.putExtras(intent.getExtras());
-		context.startService(service);
+	public void onReceive(final Context context, Intent intent) {
+		String action = intent.getAction();
+		AndroidDC dc = new AndroidDC(this, context);
+		if (Intent.ACTION_BOOT_COMPLETED.equals(action) ||
+			Intent.ACTION_USER_PRESENT.equals(action))
+		{
+			initialize(dc);
+		}
+		dc.getWatchdog().observed(dc, intent);
+	}
+
+	protected void initialize(AndroidDC dc) {
 	}
 }

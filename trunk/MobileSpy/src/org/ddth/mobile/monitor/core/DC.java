@@ -7,8 +7,11 @@ package org.ddth.mobile.monitor.core;
  *
  */
 public interface DC {
-
+	
+	/**
+	 * Get the watchdog object for registering/unregistering new observers
+	 * 
+	 * @return
+	 */
 	Watchdog getWatchdog();
-
-	Object getPlatformContext();
 }
