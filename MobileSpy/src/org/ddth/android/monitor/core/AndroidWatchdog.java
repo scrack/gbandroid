@@ -5,47 +5,61 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.ddth.android.monitor.observer.AndroidWatcher;
+import org.ddth.mobile.monitor.core.DC;
 import org.ddth.mobile.monitor.core.Observer;
 import org.ddth.mobile.monitor.core.Watchdog;
 
-import android.content.Context;
 import android.content.Intent;
 
 /**
  * @author khoanguyen
  */
 public class AndroidWatchdog implements Watchdog {
-	private Map<String, List<Observer>> observers = new HashMap<String, List<Observer>>();
+	private Map<String, List<AndroidWatcher>> observers = new HashMap<String, List<AndroidWatcher>>();
+	private Map<Object, AndroidWatcher> pool = new HashMap<Object, AndroidWatcher>();
 
-	public void observe(Context context, Intent intent) {
-		String action = intent.getAction();
-		List<Observer> list = observers.get(action);
-		for (Observer watcher : list) {
-			watcher.observed(intent);
-		}
+	public AndroidWatcher getWatcher(Integer hashCode) {
+		return pool.get(hashCode);
 	}
-
+	
 	@Override
-	public void register(Observer receiver) {
-		String[] intents = ((AndroidReceiver)receiver).getIntents();
+	public void register(Observer observer) {
+		AndroidWatcher watcher = (AndroidWatcher)observer;
+		String[] intents = watcher.getIntents();
 		for (String action : intents) {
-			List<Observer> list = observers.get(action);
+			List<AndroidWatcher> list = observers.get(action);
 			if (list == null) {
-				list = new ArrayList<Observer>();
+				list = new ArrayList<AndroidWatcher>();
 				observers.put(action, list);
 			}
-			list.add(receiver);
+			list.add(watcher);
+		}
+		pool.put(new Integer(watcher.hashCode()), watcher);
+	}
+
+	@Override
+	public void unregister(Observer observer) {
+		AndroidWatcher watcher = (AndroidWatcher)observer;
+		String[] intents = watcher.getIntents();
+		for (String action : intents) {
+			List<AndroidWatcher> list = observers.get(action);
+			if (list != null) {
+				list.remove(observer);
+			}
 		}
 	}
 
 	@Override
-	public void unregister(Observer receiver) {
-		String[] intents = ((AndroidReceiver)receiver).getIntents();
-		for (String action : intents) {
-			List<Observer> list = observers.get(action);
-			if (list != null) {
-				list.remove(receiver);
-			}
+	public void observed(DC dc, Object observable) {
+		Intent intent = (Intent) observable;
+		String action = intent.getAction();
+		List<AndroidWatcher> list = observers.get(action);
+		if (list == null) {
+			return;
+		}
+		for (AndroidWatcher watcher : list) {
+			watcher.observed(dc, observable);
 		}
 	}
 }

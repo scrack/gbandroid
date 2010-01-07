@@ -2,9 +2,8 @@ package org.ddth.android.monitor.observer;
 
 import java.util.Date;
 
-import org.ddth.android.monitor.core.AndroidReceiver;
+import org.ddth.android.monitor.core.AndroidDC;
 import org.ddth.mobile.monitor.core.DC;
-import org.ddth.mobile.monitor.core.WatcherAdapter;
 import org.ddth.mobile.monitor.report.GPS;
 
 import android.content.Context;
@@ -18,7 +17,7 @@ import android.os.Bundle;
  *
  * @param <T>
  */
-public class AndroidGpsWatcher extends WatcherAdapter<GPS> implements AndroidReceiver {
+public class AndroidGpsWatcher extends AndroidWatcher {
 
 	private static final String[] INTENTS = {};
 	
@@ -43,19 +42,18 @@ public class AndroidGpsWatcher extends WatcherAdapter<GPS> implements AndroidRec
 	@Override
 	public void start(DC dc) {
 		super.start(dc);
-		registerLocationListener((Context) dc.getPlatformContext());
+		registerLocationListener(((AndroidDC) dc).getContext());
 	}
 
 	@Override
 	public void stop(DC dc) {
 		super.stop(dc);
-		final Context context = (Context) dc.getPlatformContext();
+		Context context = ((AndroidDC) dc).getContext();
 		LocationManager manager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 		manager.removeUpdates(listener);
 	}
 	
-	@Override
-	protected GPS getReport(Object observable) {
+	protected GPS getReport(DC dc, Object observable) {
 		GPS gps = null;
 		if (observable instanceof Location) {
 			Location location = (Location)observable;
@@ -81,7 +79,7 @@ public class AndroidGpsWatcher extends WatcherAdapter<GPS> implements AndroidRec
 			public void onLocationChanged(Location location) {
 				long now = System.currentTimeMillis();
 				if (now - lastUpdateTime > GPS_LOGGING_INTERVAL) {
-					observed(location);
+					observed(null, location);
 					lastUpdateTime = now;
 				}
 			}

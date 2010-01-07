@@ -1,20 +1,17 @@
 package org.ddth.mobile.monitor.core;
 
-public interface Watcher<T extends Report> extends Observer {
+public interface Watcher extends Observer {
 	/**
-	 * Add a reporter to this watcher. Client should be
-	 * aware of number of reporters supported in order
-	 * to register properly.
-	 * 
-	 * @param reporter
+	 * Start monitoring.
+	 *   
+	 * @param dc
 	 */
-	void register(Reporter<T> reporter);
+	void start(DC dc);
 	
 	/**
-	 * Remove the given reporter from the reporter list.
-	 *  
-	 * @param reporter
-	 * @return true if the given reporter is in the list
+	 * Stop monitoring.
+	 * 
+	 * @param dc
 	 */
-	boolean unregister(Reporter<T> reporter);
+	void stop(DC dc);
 }
