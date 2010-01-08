@@ -22,7 +22,6 @@ import android.os.Parcelable;
  * @author khoanguyen
  */
 public abstract class AndroidWatcher extends WatcherAdapter {
-	
 	/**
 	 * Put interested intent's names here.
 	 * 
@@ -32,21 +31,23 @@ public abstract class AndroidWatcher extends WatcherAdapter {
 	public abstract String[] getIntents();
 
 	/**
-	 * Subclass may want to override this method to put actual event processing
-	 * code here. Beware of the context of the calling.
+	 * No specific implementation. Subclass may want to implement this method to
+	 * put actual event processing code here. Beware of the context of the
+	 * calling.
 	 * 
 	 * @param dc
 	 * @param intent
 	 */
 	public void service(AndroidDC dc, Intent intent) {
-		// Empty
+		// This method has empty body.
 	}
 
 	/**
 	 * {@inheritDoc}
 	 * <p>
-	 * Subclass may want to completely override this method in order to modify
-	 * the default behavior (starting a service to handle this event).
+	 * Default implementation will spawn a service to handle the observation.
+	 * Subclass may want to override this method in order to modify this default
+	 * behavior.
 	 * </p>
 	 */
 	@Override

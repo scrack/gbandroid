@@ -19,7 +19,7 @@ import android.os.IBinder;
  * 
  * @author khoanguyen
  */
-public class AndroidWatchdogService extends Service {
+public final class AndroidWatchdogService extends Service {
 
 	public static final String EXTRA_KEY_OBJECT_HASH_CODE = "object.hashcode";
 

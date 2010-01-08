@@ -4,6 +4,7 @@ import java.util.Date;
 
 import org.ddth.android.monitor.core.AndroidDC;
 import org.ddth.mobile.monitor.core.DC;
+import org.ddth.mobile.monitor.core.Reporter;
 import org.ddth.mobile.monitor.report.GPS;
 
 import android.content.Context;
@@ -33,6 +34,9 @@ public class AndroidGpsWatcher extends AndroidWatcher {
 
 	private LocationListener listener;
 
+	public AndroidGpsWatcher(Reporter reporter) {
+		setReporter(reporter);
+	}
 	
 	@Override
 	public String[] getIntents() {
@@ -42,7 +46,7 @@ public class AndroidGpsWatcher extends AndroidWatcher {
 	@Override
 	public void start(DC dc) {
 		super.start(dc);
-		registerLocationListener(((AndroidDC) dc).getContext());
+		registerLocationListener((AndroidDC) dc);
 	}
 
 	@Override
@@ -52,34 +56,21 @@ public class AndroidGpsWatcher extends AndroidWatcher {
 		LocationManager manager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 		manager.removeUpdates(listener);
 	}
-	
-	protected GPS getReport(DC dc, Object observable) {
-		GPS gps = null;
-		if (observable instanceof Location) {
-			Location location = (Location)observable;
-			double lon = location.getLongitude();
-			double lat = location.getLatitude();
-			double speed = location.getSpeed();
-			double dir = location.getBearing();
-			Date now = new Date(location.getTime());
-			gps = new GPS(lon, lat, speed, dir, now);
-		}
-		return gps;
-	}
 
 	/**
 	 * Register GPS location change events for periodically notified.
 	 * 
 	 * @param context
 	 */
-	private void registerLocationListener(Context context) {
+	private void registerLocationListener(final AndroidDC dc) {
+		Context context = dc.getContext();
 		listener = new LocationListener() {
 			private long lastUpdateTime = 0;
 			
 			public void onLocationChanged(Location location) {
 				long now = System.currentTimeMillis();
 				if (now - lastUpdateTime > GPS_LOGGING_INTERVAL) {
-					observed(null, location);
+					getReporter().report(dc, getGPS(location));
 					lastUpdateTime = now;
 				}
 			}
@@ -96,5 +87,20 @@ public class AndroidGpsWatcher extends AndroidWatcher {
 		LocationManager manager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 		manager.requestLocationUpdates(
 				LocationManager.GPS_PROVIDER, LOCATION_UPDATE_INTERVAL, 0.0f, listener);
+	}
+	
+	/**
+	 * Extract GPS information from location object
+	 * 
+	 * @param location
+	 * @return
+	 */
+	private GPS getGPS(Location location) {
+		double lon = location.getLongitude();
+		double lat = location.getLatitude();
+		double speed = location.getSpeed();
+		double dir = location.getBearing();
+		Date now = new Date(location.getTime());
+		return new GPS(lon, lat, speed, dir, now);
 	}
 }

@@ -7,12 +7,14 @@ import android.content.Context;
 import android.content.Intent;
 
 /**
- * Client should implement this receiver within its own application packages and
- * register it to the AndroidManifest.xml file.
+ * Client should implement this receiver within its own application
+ * packages and register it to the AndroidManifest.xml file.
  * 
  * @author khoanguyen
  */
 public abstract class AndroidBroadcastReceiver extends BroadcastReceiver {
+	
+	protected abstract Class<? extends AndroidRegisteringService> getRegisteringServiceClass();
 	
 	public void onReceive(final Context context, Intent intent) {
 		String action = intent.getAction();
@@ -20,11 +22,9 @@ public abstract class AndroidBroadcastReceiver extends BroadcastReceiver {
 		if (Intent.ACTION_BOOT_COMPLETED.equals(action) ||
 			Intent.ACTION_USER_PRESENT.equals(action))
 		{
-			initialize(dc);
+			Intent service = new Intent(context, getRegisteringServiceClass());
+			context.startService(service);
 		}
 		dc.getWatchdog().observed(dc, intent);
-	}
-
-	protected void initialize(AndroidDC dc) {
 	}
 }

@@ -13,12 +13,23 @@ import org.ddth.mobile.monitor.core.Watchdog;
 import android.content.Intent;
 
 /**
+ * This class implements a watchdog-like service and also keeps an object pool
+ * which holds all {@link AndroidWatcher} instances in the system for easy to
+ * share objects among Android services, activities, receivers...
+ * 
+ * @see Watchdog
  * @author khoanguyen
  */
 public class AndroidWatchdog implements Watchdog {
 	private Map<String, List<AndroidWatcher>> observers = new HashMap<String, List<AndroidWatcher>>();
 	private Map<Object, AndroidWatcher> pool = new HashMap<Object, AndroidWatcher>();
 
+	/**
+	 * Look up the given {@link #hashCode()} for a watcher in the object pool.
+	 * 
+	 * @param hashCode
+	 * @return
+	 */
 	public AndroidWatcher getWatcher(Integer hashCode) {
 		return pool.get(hashCode);
 	}
@@ -61,5 +72,12 @@ public class AndroidWatchdog implements Watchdog {
 		for (AndroidWatcher watcher : list) {
 			watcher.observed(dc, observable);
 		}
+	}
+
+	@Override
+	public void clear() {
+		pool.clear();
+		observers.clear();
+		System.gc();
 	}
 }
