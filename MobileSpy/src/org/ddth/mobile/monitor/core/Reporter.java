@@ -1,6 +1,6 @@
 package org.ddth.mobile.monitor.core;
 
-public interface Reporter<T extends Report> {
+public interface Reporter {
 
-	void report(T report);
+	void report(DC dc, Report report);
 }
