@@ -41,21 +41,24 @@ public class AndroidCallWatcher extends AndroidWatcher {
 	public void start(DC dc) {
 		super.start(dc);
 		Context context = ((AndroidDC)dc).getContext();
-		TelephonyManager telephony = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+		TelephonyManager telephony = (TelephonyManager) context.getSystemService(
+				Context.TELEPHONY_SERVICE);
 		phoneNumber = telephony.getLine1Number();
 	}
 	
 	@Override
 	public void service(final AndroidDC dc, Intent intent) {
 		String phoneState = intent.getExtras().getString(TelephonyManager.EXTRA_STATE);
-		// An idle state means the call has just been ended. We should proceed to
-		// extract calling information from call log.
+		// An idle state means the call has just been ended. We should proceed
+		// to extract calling information from call log.
 		if (TelephonyManager.EXTRA_STATE_IDLE.equals(phoneState)) {
 			final Context context = dc.getContext();
+			// To ensure the data is fully updated & stable to be correctly
+			// read, we defer the processing a little bit, 500ms...
 			handler.postDelayed(new Runnable() {
 				@Override
 				public void run() {
-					Call call = parseCall(context);
+					Call call = getCall(context);
 					if (call != null) {
 						getReporter().report(dc, call);
 					}
@@ -64,9 +67,13 @@ public class AndroidCallWatcher extends AndroidWatcher {
 		}
 	}
 
-	private Call parseCall(Context context) {
-		// To ensure the data is fully updated & stable to be correctly read, we
-		// might need to defer the processing a little bit...
+	/**
+	 * Get the most recently called data from the call log.
+	 * 
+	 * @param context
+	 * @return
+	 */
+	private Call getCall(Context context) {
 		Cursor cursor = context.getContentResolver().query(
 				CallLog.Calls.CONTENT_URI,
 				null, null, null,
