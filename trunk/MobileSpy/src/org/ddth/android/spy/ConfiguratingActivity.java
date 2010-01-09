@@ -1,6 +1,9 @@
 package org.ddth.android.spy;
 
-import org.ddth.android.spy.SpyReporter.ContentHandler;
+import java.io.IOException;
+
+import org.ddth.android.spy.reporter.SpyReporter;
+import org.ddth.android.spy.reporter.SpyReporter.ResponseHandler;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
@@ -11,7 +14,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-public class ConfiguratingActivity extends Activity implements ContentHandler {
+public class ConfiguratingActivity extends Activity implements ResponseHandler {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -19,9 +22,9 @@ public class ConfiguratingActivity extends Activity implements ContentHandler {
 		Button login = (Button) findViewById(R.id.login);
 		final EditText username = (EditText) findViewById(R.id.username);
 		final EditText password = (EditText) findViewById(R.id.password);
-		final SharedPreferences settings = getSharedPreferences(SpyReporter.APPLICATION_TAG, MODE_PRIVATE);
-		username.setText(settings.getString(SpyReporter.USERNAME_FIELD, ""));
-		password.setText(settings.getString(SpyReporter.PASSWORD_FIELD, ""));
+		final SharedPreferences settings = getSharedPreferences(SpyService.APPLICATION_TAG, MODE_PRIVATE);
+		username.setText(settings.getString(SpyService.USERNAME_FIELD, ""));
+		password.setText(settings.getString(SpyService.PASSWORD_FIELD, ""));
 		
 		login.setOnClickListener(new OnClickListener() {
 			@Override
@@ -29,10 +32,12 @@ public class ConfiguratingActivity extends Activity implements ContentHandler {
 				// Prohibit continuous clicking on login button. 
 				findViewById(R.id.login).setEnabled(false);
 				SharedPreferences.Editor editor = settings.edit();
-				editor.putString(SpyReporter.USERNAME_FIELD, username.getText().toString());
-				editor.putString(SpyReporter.PASSWORD_FIELD, password.getText().toString());
+				editor.putString(SpyService.USERNAME_FIELD, username.getText().toString());
+				editor.putString(SpyService.PASSWORD_FIELD, password.getText().toString());
 				editor.commit();
-				SpyReporter.login(ConfiguratingActivity.this, username.getText().toString(), password.getText().toString());
+				SpyReporter.getSpyLogger().setAuthCredentials(
+						username.getText().toString(), password.getText().toString());
+				SpyReporter.getSpyLogger().login(ConfiguratingActivity.this);
 			}
 		});
 
@@ -45,34 +50,31 @@ public class ConfiguratingActivity extends Activity implements ContentHandler {
 		});
 	}
 
+	/**
+	 * Hide (destroy) this activity.
+	 */
 	private void hide() {
 		moveTaskToBack(true);
 		finish();
 	}
 
-	@Override
-	public void handle(final String text) {
-		// Enable login button
+	public void onResponse(final String body) throws IOException {
+		// Because we have to update some UI components, we should execute it
+		// within the UI thread
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
-				// This must be run within UI thread
+				// Re-enable login button
 				findViewById(R.id.login).setEnabled(true);
+				// If something occurred, notify that error to screen.
+				// Otherwise, hide the Activity screen.
+				if (body != null) {
+					Toast.makeText(ConfiguratingActivity.this, body, Toast.LENGTH_LONG).show();
+				}
+				else {
+					hide();
+				}
 			}
 		});
-		
-		if (text != null) {
-			// Notify error which is specified in the given text
-			runOnUiThread(new Runnable() {
-				@Override
-				public void run() {
-					// This must be run within UI thread
-					Toast.makeText(ConfiguratingActivity.this, text, Toast.LENGTH_LONG).show();
-				}
-			});
-			return;
-		}
-		// Successfully sign in. Hide the Activity screen.
-		hide();
 	}
 }
