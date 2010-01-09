@@ -73,13 +73,24 @@ public class ThreadPoolConnectionModel implements ConnectionModel {
 	/**
 	 * Support adding a ConnectionListener during its creation time.
 	 * 
-	 * @param listener
 	 */
-	public ThreadPoolConnectionModel(ConnectionListener listener) {
-		monitor = listener;
+	public ThreadPoolConnectionModel() {
 		httpClient = createHttpClient();
 	}
 
+	/**
+	 * Set a default listener for all requests. However, it gets notified
+	 * only if no listener is specified in the request sending method.
+	 * 
+	 * @see #sendRequest(Request)
+	 * @see #sendRequest(ConnectionListener, Request)
+	 * 
+	 * @param monitor
+	 */
+	public void setConnectionListener(ConnectionListener monitor) {
+		this.monitor = monitor;
+	}
+	
 	public void open() {
 		executor = Executors.newScheduledThreadPool(2);
 	}
@@ -95,14 +106,18 @@ public class ThreadPoolConnectionModel implements ConnectionModel {
 		}
 	}
 
-	public RequestFuture sendRequest(final Request request) {
+	public RequestFuture sendRequest(Request request) {
+		return sendRequest(monitor, request);
+	}
+
+	public RequestFuture sendRequest(final ConnectionListener listener, final Request request) {
 		if (!running()) {
 			return null;
 		}
 		final HttpUriRequest httpRequest = createHttpRequest(request);
 		final Future<Response> future = executor.submit(new Callable<Response>() {
 			public Response call() throws Exception {
-				return request(request, httpRequest);
+				return request(listener, request, httpRequest);
 			}
 		});
 		
@@ -114,11 +129,12 @@ public class ThreadPoolConnectionModel implements ConnectionModel {
 			}
 		};
 	}
-
+	
 	/**
 	 * Send a request and wait for the responding in a blocking way. Also notify
 	 * to the monitor every change in every state.
 	 * 
+	 * @param monitor
 	 * @param request
 	 *            The original/internal request.
 	 * @param httpRequest
@@ -126,7 +142,7 @@ public class ThreadPoolConnectionModel implements ConnectionModel {
 	 * @return A Response object which contains every responding data from
 	 *         server.
 	 */
-	private Response request(final Request request, final HttpUriRequest httpRequest) {
+	private Response request(ConnectionListener monitor, final Request request, final HttpUriRequest httpRequest) {
 		HttpEntity entity = null;
 		Response response = null;
 		RequestFuture future = null;

@@ -7,6 +7,8 @@
  **************************************************/
 package org.ddth.http.core.connection;
 
+import org.ddth.http.core.ConnectionListener;
+
 
 /**
  * A transportation service which supports client to make any requests to a
@@ -30,6 +32,15 @@ public interface ConnectionModel {
 	 * @return A RequestFuture object for client to cancel or collect result.
 	 */
 	public RequestFuture sendRequest(Request request);
+	
+	/**
+	 * Send a non blocking request and listen to connection events.
+	 *  
+	 * @param listener
+	 * @param request
+	 * @return
+	 */
+	public RequestFuture sendRequest(ConnectionListener listener, Request request);
 
 	/**
 	 * Start running its engine.
