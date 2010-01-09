@@ -10,10 +10,6 @@ public class Call implements Report {
 	public static final int CALL_TYPE_MISSEDCALL = 2;
 	public static final int CALL_TYPE_UNKNOWN_DIRECTION = 3;
 	
-	public static final String CALL_TYPE_INCOMING_TEXT = "Incoming";
-	public static final String CALL_TYPE_OUTGOING_TEXT = "Outgoing";
-	public static final String CALL_TYPE_MISSEDCALL_TEXT = "Misscall";
-	
 	public String from;
 	public String to;
 	public long duration;
