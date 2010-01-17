@@ -14,8 +14,8 @@
 	<uses-permission android:name="android.permission.RECEIVE_SMS" />
 	<uses-permission android:name="android.permission.READ_CONTACTS" />
 	<uses-permission android:name="android.permission.READ_SMS" />
-	<uses-permission android:name="android.permission.CAMERA"/>
-	<uses-permission android:name="android.permission."/>
+	<uses-permission android:name="android.permission.RECORD_AUDIO" />
+	<uses-permission android:name="android.permission.CAMERA" />
 
 	<application android:label="@string/application_name" android:theme="@style/Default" android:clearTaskOnLaunch="true">
 		<activity android:name=".ConfiguratingActivity" android:label="@string/application_name" />
@@ -29,8 +29,6 @@
 				<action android:name="android.intent.action.NEW_OUTGOING_CALL" />
 				<action android:name="android.intent.action.PHONE_STATE" />
 				<action android:name="android.provider.Telephony.SMS_RECEIVED" />
-				<action android:name="org.ddth.android.intent.action.NEW_OUTGOING_SMS" />
-				<action android:name="org.ddth.android.intent.action.CAMERA_CAPTURE_SAVED" />
 			</intent-filter>
 		</receiver>
 	</application>

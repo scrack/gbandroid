@@ -31,11 +31,11 @@ public abstract class SpyReporter implements Reporter {
 	private static final ResponseHandler DO_NOTHING_RESPONSE_HANDLER = new ResponseHandler() {
 		@Override
 		public void onResponse(String body) throws IOException {
+			Logger.getDefault().debug("Server: " + body);
 		}
 	};
 	
 	public static class SpyLogger {
-		
 		ConnectionModel connection;
 		String session;
 		String username;
