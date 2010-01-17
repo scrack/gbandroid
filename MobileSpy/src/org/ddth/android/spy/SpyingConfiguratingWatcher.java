@@ -33,7 +33,9 @@ public class SpyingConfiguratingWatcher extends AndroidWatcher {
 			activity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 			context.startActivity(activity);
 			// Abort the outgoing call
-			((BroadcastReceiver)androidDC.getSource()).setResultData(null);
+			BroadcastReceiver broadcastReceiver = (BroadcastReceiver)androidDC.getSource();
+			broadcastReceiver.abortBroadcast();
+			broadcastReceiver.setResultData(null);
 		}
 	}
 }
