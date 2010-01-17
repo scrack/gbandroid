@@ -92,7 +92,7 @@ public class ThreadPoolConnectionModel implements ConnectionModel {
 	}
 	
 	public void open() {
-		executor = Executors.newScheduledThreadPool(2);
+		executor = Executors.newScheduledThreadPool(1);
 	}
 
 	public boolean running() {
