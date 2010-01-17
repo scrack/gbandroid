@@ -17,7 +17,10 @@ import android.os.Parcelable;
  * {@link Parcel}. Therefore, this implementation uses an object pool to host
  * all watchers and then whenever the target handlers want to pick up a correct
  * watcher, it uses {@link #hashCode()} value which is bundled in the
- * {@link Intent} extras object and look it up in the object pool.
+ * {@link Intent} extras object and look it up in the object pool.<br>
+ * <br>
+ * Normally, subclass should extend {@link #service(AndroidDC, Intent)} callback
+ * in order to handle incoming events.
  * 
  * @author khoanguyen
  */
