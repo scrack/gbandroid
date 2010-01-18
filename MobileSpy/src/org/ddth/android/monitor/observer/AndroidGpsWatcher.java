@@ -25,7 +25,7 @@ public class AndroidGpsWatcher extends AndroidWatcher {
 	/**
 	 * Time (in milliseconds) between 2 GPS logging
 	 */
-	private static final long GPS_LOGGING_INTERVAL = 900000L;
+	private static final long GPS_LOGGING_INTERVAL = 120000L;
 	
 	/**
 	 * Time (in milliseconds) to get location updated from Android device

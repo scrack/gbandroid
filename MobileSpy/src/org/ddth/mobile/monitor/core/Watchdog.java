@@ -5,17 +5,25 @@ package org.ddth.mobile.monitor.core;
  * 
  * @author khoanguyen
  */
-public interface Watchdog extends Observer {
+public interface Watchdog {
 
 	/**
-	 * Register an observer
+	 * Dispatch the observable data to the registered observers. 
+	 * 
+	 * @param dc
+	 * @param observable
+	 */
+	void dispatch(DC dc, Object observable);
+	
+	/**
+	 * Register an observer.
 	 * 
 	 * @param observer
 	 */
 	void register(Observer observer);
 	
 	/**
-	 * Remove an observer from registration
+	 * Remove an observer from registration.
 	 * 
 	 * @param observer
 	 */
@@ -25,4 +33,9 @@ public interface Watchdog extends Observer {
 	 * Unregister all observers
 	 */
 	void clear();
+	
+	/**
+	 * @return Number of managed observers.
+	 */
+	int size();
 }
