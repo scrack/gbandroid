@@ -1,6 +1,6 @@
 package org.ddth.mobile.monitor.core;
 
-public interface Watcher extends Observer {
+public interface Watcher {
 	/**
 	 * Start monitoring.
 	 *   
@@ -14,4 +14,14 @@ public interface Watcher extends Observer {
 	 * @param dc
 	 */
 	void stop(DC dc);
+	
+	/**
+	 * @return The observer.
+	 */
+	Observer getObserver();
+	
+	/**
+	 * @return The reporter.
+	 */
+	Reporter getReporter();
 }

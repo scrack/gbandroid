@@ -62,7 +62,7 @@ public class AndroidWatchdog implements Watchdog {
 	}
 
 	@Override
-	public void observed(DC dc, Object observable) {
+	public void dispatch(DC dc, Object observable) {
 		Intent intent = (Intent) observable;
 		String action = intent.getAction();
 		List<AndroidWatcher> list = observers.get(action);
@@ -79,5 +79,10 @@ public class AndroidWatchdog implements Watchdog {
 		pool.clear();
 		observers.clear();
 		System.gc();
+	}
+
+	@Override
+	public int size() {
+		return pool.size();
 	}
 }

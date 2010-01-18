@@ -3,6 +3,7 @@ package org.ddth.android.monitor.observer;
 import org.ddth.android.monitor.AndroidWatchdogService;
 import org.ddth.android.monitor.core.AndroidDC;
 import org.ddth.mobile.monitor.core.DC;
+import org.ddth.mobile.monitor.core.Observer;
 import org.ddth.mobile.monitor.core.WatcherAdapter;
 
 import android.content.Context;
@@ -24,7 +25,7 @@ import android.os.Parcelable;
  * 
  * @author khoanguyen
  */
-public abstract class AndroidWatcher extends WatcherAdapter {
+public abstract class AndroidWatcher extends WatcherAdapter implements Observer {
 	/**
 	 * Put interested intent's names here.
 	 * 
@@ -60,6 +61,11 @@ public abstract class AndroidWatcher extends WatcherAdapter {
 		startService(context, intent);
 	}
 
+	@Override
+	public Observer getObserver() {
+		return this;
+	}
+	
 	/**
 	 * Start the watchdog service to handle this event.
 	 * 
