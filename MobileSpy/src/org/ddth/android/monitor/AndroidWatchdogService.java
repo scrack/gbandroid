@@ -1,15 +1,17 @@
 package org.ddth.android.monitor;
 
-import org.ddth.android.monitor.core.AndroidDC;
+import org.ddth.android.monitor.core.AndroidEvent;
 import org.ddth.android.monitor.core.AndroidWatchdog;
 import org.ddth.android.monitor.observer.AndroidWatcher;
-import org.ddth.mobile.monitor.core.DC;
+import org.ddth.http.core.Logger;
 import org.ddth.mobile.monitor.core.Observer;
 import org.ddth.mobile.monitor.core.Watchdog;
+import org.ddth.mobile.monitor.core.Watcher;
 
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.IBinder;
 
 /**
@@ -24,7 +26,7 @@ import android.os.IBinder;
  * @author khoanguyen
  */
 public final class AndroidWatchdogService extends Service {
-	public static final String EXTRA_KEY_OBJECT_HASH_CODE = "object.hashcode";
+	private static final String EXTRA_KEY_OBJECT_HASH_CODE = "object.hashcode";
 
 	/**
 	 * A {@link Watchdog} may be accessed from multiple places for retrieving
@@ -34,12 +36,29 @@ public final class AndroidWatchdogService extends Service {
 	 * at a time, and thus we could put this {@link #watchdog} object there but
 	 * it isn't wise to do so.
 	 */
-	private static Watchdog watchdog = new AndroidWatchdog();
+	private static AndroidWatchdog watchdog = new AndroidWatchdog();
 
-	public static DC createDC(Object source, Context context) {
-		return new AndroidDC(source, context, watchdog);
+	public static Watchdog getWatchdog() {
+		return watchdog;
 	}
-	
+
+	/**
+	 * Start the watchdog service to handle this event.
+	 * 
+	 * @param context
+	 * @param intent
+	 */
+	public static void start(Context context, Intent intent, Watcher watcher) {
+		Intent service = new Intent(context, AndroidWatchdogService.class);
+		Bundle extras = intent.getExtras();
+		if (extras != null) {
+			service.putExtras(extras);
+		}
+		service.putExtra(EXTRA_KEY_OBJECT_HASH_CODE, watcher.hashCode());
+		Logger.getDefault().trace("Start Android service to handle incoming event..");
+		context.startService(service);
+	}
+
 	@Override
 	public void onCreate() {
 		super.onCreate();
@@ -52,11 +71,18 @@ public final class AndroidWatchdogService extends Service {
 		// The service looks up the appropriate watcher by using
 		// information in the given intent and then delegate the
 		// processing to this watcher.
-		AndroidDC dc = new AndroidDC(this, watchdog);
-		AndroidWatchdog watchdog = (AndroidWatchdog) dc.getWatchdog();
-		Object key = intent.getExtras().get(EXTRA_KEY_OBJECT_HASH_CODE);
-		AndroidWatcher watcher = watchdog.getWatcher((Integer) key);
-		watcher.service(dc, intent);
+		AndroidEvent event = new AndroidEvent(this, this, intent);
+		Bundle extras = intent.getExtras();
+		Object key = extras != null ? extras.get(EXTRA_KEY_OBJECT_HASH_CODE) : null;
+		if (key != null) {
+			AndroidWatcher watcher = watchdog.getWatcher((Integer) key);
+			watcher.service(event);
+		}
+		else {
+			Logger.getDefault().trace("Start all watchers..");
+			// Start all watchers
+			watchdog.start(event);
+		}
 	}
 
 	@Override

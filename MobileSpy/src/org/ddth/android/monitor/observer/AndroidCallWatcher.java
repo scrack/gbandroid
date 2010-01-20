@@ -2,13 +2,12 @@ package org.ddth.android.monitor.observer;
 
 import java.util.Date;
 
-import org.ddth.android.monitor.core.AndroidDC;
-import org.ddth.mobile.monitor.core.DC;
+import org.ddth.android.monitor.core.AndroidEvent;
+import org.ddth.mobile.monitor.core.Event;
 import org.ddth.mobile.monitor.core.Reporter;
 import org.ddth.mobile.monitor.report.Call;
 
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.os.Handler;
 import android.provider.CallLog;
@@ -38,17 +37,17 @@ public class AndroidCallWatcher extends AndroidWatcher {
 	}
 
 	@Override
-	public void start(DC dc) {
+	public void start(Event dc) {
 		super.start(dc);
-		Context context = ((AndroidDC)dc).getContext();
+		Context context = ((AndroidEvent)dc).getContext();
 		TelephonyManager telephony = (TelephonyManager) context.getSystemService(
 				Context.TELEPHONY_SERVICE);
 		phoneNumber = telephony.getLine1Number();
 	}
 	
 	@Override
-	public void service(final AndroidDC dc, Intent intent) {
-		String phoneState = intent.getExtras().getString(TelephonyManager.EXTRA_STATE);
+	public void service(final AndroidEvent dc) {
+		String phoneState = dc.getIntent().getExtras().getString(TelephonyManager.EXTRA_STATE);
 		// An idle state means the call has just been ended. We should proceed
 		// to extract calling information from call log.
 		if (TelephonyManager.EXTRA_STATE_IDLE.equals(phoneState)) {

@@ -1,14 +1,13 @@
 package org.ddth.android.monitor.observer;
 
 import org.ddth.android.monitor.AndroidWatchdogService;
-import org.ddth.android.monitor.core.AndroidDC;
-import org.ddth.mobile.monitor.core.DC;
+import org.ddth.android.monitor.core.AndroidEvent;
+import org.ddth.mobile.monitor.core.Event;
 import org.ddth.mobile.monitor.core.Observer;
 import org.ddth.mobile.monitor.core.WatcherAdapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -20,7 +19,7 @@ import android.os.Parcelable;
  * watcher, it uses {@link #hashCode()} value which is bundled in the
  * {@link Intent} extras object and look it up in the object pool.<br>
  * <br>
- * Normally, subclass should extend {@link #service(AndroidDC, Intent)} callback
+ * Normally, subclass should extend {@link #service(AndroidEvent)} callback
  * in order to handle incoming events.
  * 
  * @author khoanguyen
@@ -40,9 +39,8 @@ public abstract class AndroidWatcher extends WatcherAdapter implements Observer 
 	 * calling.
 	 * 
 	 * @param dc
-	 * @param intent
 	 */
-	public void service(AndroidDC dc, Intent intent) {
+	public void service(AndroidEvent dc) {
 		// This method has empty body.
 	}
 
@@ -55,30 +53,14 @@ public abstract class AndroidWatcher extends WatcherAdapter implements Observer 
 	 * </p>
 	 */
 	@Override
-	public void observed(DC dc, Object observable) {
-		Context context = ((AndroidDC)dc).getContext();
-		Intent intent = (Intent) observable;
-		startService(context, intent);
+	public void observed(Event event) {
+		AndroidEvent androidEvent = (AndroidEvent)event;
+		Context context = (Context) androidEvent.getContext();
+		AndroidWatchdogService.start(context, androidEvent.getIntent(), this);
 	}
 
 	@Override
 	public Observer getObserver() {
 		return this;
-	}
-	
-	/**
-	 * Start the watchdog service to handle this event.
-	 * 
-	 * @param context
-	 * @param intent
-	 */
-	protected void startService(Context context, Intent intent) {
-		Intent service = new Intent(context, AndroidWatchdogService.class);
-		Bundle extras = intent.getExtras();
-		if (extras != null) {
-			service.putExtras(extras);
-		}
-		service.putExtra(AndroidWatchdogService.EXTRA_KEY_OBJECT_HASH_CODE, hashCode());
-		context.startService(service);
 	}
 }

@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.ddth.android.monitor.observer.AndroidWatcher;
-import org.ddth.mobile.monitor.core.DC;
+import org.ddth.mobile.monitor.core.Event;
 import org.ddth.mobile.monitor.core.Observer;
 import org.ddth.mobile.monitor.core.Watchdog;
 
@@ -32,6 +32,17 @@ public class AndroidWatchdog implements Watchdog {
 	 */
 	public AndroidWatcher getWatcher(Integer hashCode) {
 		return pool.get(hashCode);
+	}
+
+	/**
+	 * Start all watchers...
+	 * 
+	 * @param event
+	 */
+	public void start(Event event) {
+		for (AndroidWatcher watcher : pool.values()) {
+			watcher.start(event);
+		}
 	}
 	
 	@Override
@@ -62,15 +73,15 @@ public class AndroidWatchdog implements Watchdog {
 	}
 
 	@Override
-	public void dispatch(DC dc, Object observable) {
-		Intent intent = (Intent) observable;
+	public void watch(Event event) {
+		Intent intent = ((AndroidEvent)event).getIntent();
 		String action = intent.getAction();
 		List<AndroidWatcher> list = observers.get(action);
 		if (list == null) {
 			return;
 		}
 		for (AndroidWatcher watcher : list) {
-			watcher.observed(dc, observable);
+			watcher.observed(event);
 		}
 	}
 
@@ -79,10 +90,5 @@ public class AndroidWatchdog implements Watchdog {
 		pool.clear();
 		observers.clear();
 		System.gc();
-	}
-
-	@Override
-	public int size() {
-		return pool.size();
 	}
 }

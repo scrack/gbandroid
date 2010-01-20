@@ -1,37 +1,52 @@
 package org.ddth.android.monitor;
 
+import org.ddth.android.monitor.core.AndroidEvent;
 import org.ddth.http.core.Logger;
-import org.ddth.mobile.monitor.core.DC;
 import org.ddth.mobile.monitor.core.Watchdog;
-import org.ddth.mobile.monitor.core.Watcher;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
 /**
- * Client should implement this receiver within its own application
- * packages and register it to the AndroidManifest.xml file.
+ * Client must implement this receiver and add the following lines in the
+ * AndroidManifest.xml file in order to work properly.
+ * 
+ * <pre>
+ * &lt;receiver android:name="org.ddth.android.monitor.AndroidBroadcastReceiver"&gt;
+ *     &lt;intent-filter&gt;
+ *         &lt;action android:name="android.intent.action.BOOT_COMPLETED" /&gt;
+ *         &lt;action android:name="android.intent.action.USER_PRESENT" /&gt;
+ *         &lt;action android:name="android.intent.action.NEW_OUTGOING_CALL" /&gt;
+ *         &lt;action android:name="android.intent.action.PHONE_STATE" /&gt;
+ *         &lt;action android:name="android.provider.Telephony.SMS_RECEIVED" /&gt;
+ *     &lt;/intent-filter&gt;
+ * &lt;/receiver&gt;
+ * </pre>
  * 
  * @author khoanguyen
  */
-public class AndroidBroadcastReceiver extends BroadcastReceiver {
+public abstract class AndroidBroadcastReceiver extends BroadcastReceiver {
 
-	public void onReceive(final Context context, Intent intent) {
-		DC dc = AndroidWatchdogService.createDC(this, context);
-		Watchdog watchdog = dc.getWatchdog();
-		// Check if we should start the observer registration service  
-		if (watchdog.size() == 0) {
-			try {
-				String className = intent.getStringExtra("watchdog");
-				Class clazz = Class.forName(className);
-				Watcher watcher = (Watcher) clazz.newInstance();
-				watcher.start(dc);
-			}
-			catch (Exception e) {
-				Logger.getDefault().error("Error when creating watchdog", e);
-			}
+	/**
+	 * Use volatile to reduce the probability of invalid thread access error
+	 * here ;-)...
+	 */
+	private volatile static boolean initialized = false;
+	
+	protected abstract void initialize(Watchdog watchdog, AndroidEvent event);
+	
+	public void onReceive(Context context, Intent intent) {
+		AndroidEvent event = new AndroidEvent(this, context, intent);
+		Watchdog watchdog = AndroidWatchdogService.getWatchdog();
+		// Check if we should start registration process.
+ 		if (!initialized) {
+			initialized = true;
+			initialize(watchdog, event);
+			Logger.getDefault().trace("Start Android service to start all watchers..");
+			Intent service = new Intent(context, AndroidWatchdogService.class);
+			context.startService(service);
 		}
-		watchdog.dispatch(dc, intent);
+		watchdog.watch(event);
 	}
 }
