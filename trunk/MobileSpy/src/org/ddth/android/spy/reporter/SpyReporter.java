@@ -39,6 +39,7 @@ public abstract class SpyReporter implements Reporter {
 		String session;
 		String username;
 		String password;
+		ConnectionModel connection = new ThreadPoolConnectionModel();
 		
 		SpyLogger() {
 		}
@@ -84,7 +85,6 @@ public abstract class SpyReporter implements Reporter {
 		}
 
 		public void sendRequest(final ResponseHandler handler, Request request) {
-			final ConnectionModel connection = new ThreadPoolConnectionModel();
 			connection.open();
 			connection.sendRequest(new ConnectionListener() {
 				@Override
@@ -115,6 +115,7 @@ public abstract class SpyReporter implements Reporter {
 						break;
 						
 					case ConnectionEvent.REQUEST_FINISHED:
+						Logger.getDefault().trace("Close connection pool!");
 						connection.close();
 						break;
 					}

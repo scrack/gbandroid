@@ -56,7 +56,7 @@ public interface ConnectionModel {
 
 	/**
 	 * Close the connection. Other invocation has no effect if the connection
-	 * was closed. Open it again before making any requests.
+	 * was closed. Open it again before making any further requests.
 	 */
 	public void close();
 
