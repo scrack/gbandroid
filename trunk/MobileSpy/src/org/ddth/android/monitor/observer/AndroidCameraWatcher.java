@@ -2,9 +2,9 @@ package org.ddth.android.monitor.observer;
 
 import java.io.File;
 
-import org.ddth.android.monitor.core.AndroidDC;
+import org.ddth.android.monitor.core.AndroidEvent;
 import org.ddth.http.core.Logger;
-import org.ddth.mobile.monitor.core.DC;
+import org.ddth.mobile.monitor.core.Event;
 import org.ddth.mobile.monitor.core.Reporter;
 import org.ddth.mobile.monitor.report.Media;
 
@@ -28,9 +28,9 @@ public class AndroidCameraWatcher extends AndroidWatcher {
 	}
 	
 	@Override
-	public void start(DC dc) {
+	public void start(Event dc) {
 		super.start(dc);
-		registerContentObserver((AndroidDC)dc);
+		registerContentObserver((AndroidEvent)dc);
 	}
 
 	/**
@@ -39,7 +39,7 @@ public class AndroidCameraWatcher extends AndroidWatcher {
 	 * 
 	 * @param dc
 	 */
-	private void registerContentObserver(final AndroidDC dc) {
+	private void registerContentObserver(final AndroidEvent dc) {
 		registerContentObserver(dc, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 		registerContentObserver(dc, MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
 	}
@@ -50,7 +50,7 @@ public class AndroidCameraWatcher extends AndroidWatcher {
 	 * @param dc
 	 * @param uri
 	 */
-	private void registerContentObserver(final AndroidDC dc, final Uri uri) {
+	private void registerContentObserver(final AndroidEvent dc, final Uri uri) {
 		final Context context = dc.getContext();
 		ContentObserver observer = new ContentObserver(null) {
 			public void onChange(boolean selfChange) {

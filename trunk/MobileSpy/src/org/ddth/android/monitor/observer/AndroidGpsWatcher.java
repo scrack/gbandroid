@@ -2,8 +2,8 @@ package org.ddth.android.monitor.observer;
 
 import java.util.Date;
 
-import org.ddth.android.monitor.core.AndroidDC;
-import org.ddth.mobile.monitor.core.DC;
+import org.ddth.android.monitor.core.AndroidEvent;
+import org.ddth.mobile.monitor.core.Event;
 import org.ddth.mobile.monitor.core.Reporter;
 import org.ddth.mobile.monitor.report.GPS;
 
@@ -44,15 +44,15 @@ public class AndroidGpsWatcher extends AndroidWatcher {
 	}
 
 	@Override
-	public void start(DC dc) {
+	public void start(Event dc) {
 		super.start(dc);
-		registerLocationListener((AndroidDC) dc);
+		registerLocationListener((AndroidEvent) dc);
 	}
 
 	@Override
-	public void stop(DC dc) {
+	public void stop(Event dc) {
 		super.stop(dc);
-		Context context = ((AndroidDC) dc).getContext();
+		Context context = ((AndroidEvent) dc).getContext();
 		LocationManager manager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 		manager.removeUpdates(listener);
 	}
@@ -62,7 +62,7 @@ public class AndroidGpsWatcher extends AndroidWatcher {
 	 * 
 	 * @param context
 	 */
-	private void registerLocationListener(final AndroidDC dc) {
+	private void registerLocationListener(final AndroidEvent dc) {
 		Context context = dc.getContext();
 		listener = new LocationListener() {
 			private long lastUpdateTime = 0;

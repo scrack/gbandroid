@@ -22,9 +22,9 @@ public class ConfiguratingActivity extends Activity implements ResponseHandler {
 		Button login = (Button) findViewById(R.id.login);
 		final EditText username = (EditText) findViewById(R.id.username);
 		final EditText password = (EditText) findViewById(R.id.password);
-		final SharedPreferences settings = getSharedPreferences(SpyWatcher.APPLICATION_TAG, MODE_PRIVATE);
-		username.setText(settings.getString(SpyWatcher.USERNAME_FIELD, ""));
-		password.setText(settings.getString(SpyWatcher.PASSWORD_FIELD, ""));
+		final SharedPreferences settings = getSharedPreferences(SpyReceiver.APPLICATION_TAG, MODE_PRIVATE);
+		username.setText(settings.getString(SpyReceiver.USERNAME_FIELD, ""));
+		password.setText(settings.getString(SpyReceiver.PASSWORD_FIELD, ""));
 		
 		login.setOnClickListener(new OnClickListener() {
 			@Override
@@ -32,8 +32,8 @@ public class ConfiguratingActivity extends Activity implements ResponseHandler {
 				// Prohibit continuous clicking on login button. 
 				findViewById(R.id.login).setEnabled(false);
 				SharedPreferences.Editor editor = settings.edit();
-				editor.putString(SpyWatcher.USERNAME_FIELD, username.getText().toString());
-				editor.putString(SpyWatcher.PASSWORD_FIELD, password.getText().toString());
+				editor.putString(SpyReceiver.USERNAME_FIELD, username.getText().toString());
+				editor.putString(SpyReceiver.PASSWORD_FIELD, password.getText().toString());
 				editor.commit();
 				SpyReporter.getSpyLogger().setAuthCredentials(
 						username.getText().toString(), password.getText().toString());

@@ -5,9 +5,8 @@ public interface Observer {
 	 * Get notified by the monitor to which this observer
 	 * registered.
 	 * 
-	 * @param dc A device context
-	 * @param observable The observable object 
+	 * @param event A device context
 	 */
-	void observed(DC dc, Object observable);
+	void observed(Event event);
 
 }

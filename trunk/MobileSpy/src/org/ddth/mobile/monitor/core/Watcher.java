@@ -6,14 +6,14 @@ public interface Watcher {
 	 *   
 	 * @param dc
 	 */
-	void start(DC dc);
+	void start(Event dc);
 	
 	/**
 	 * Stop monitoring.
 	 * 
 	 * @param dc
 	 */
-	void stop(DC dc);
+	void stop(Event dc);
 	
 	/**
 	 * @return The observer.
