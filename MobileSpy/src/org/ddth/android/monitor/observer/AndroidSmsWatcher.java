@@ -18,7 +18,6 @@ import android.telephony.gsm.SmsMessage;
 
 /**
  * @author khoanguyen
- *
  */
 public final class AndroidSmsWatcher extends AndroidWatcher {
 	
@@ -90,9 +89,9 @@ public final class AndroidSmsWatcher extends AndroidWatcher {
 	}
 
 	/**
-	 * This is invoked directly from the SMS observer to wrap the outgoing SMS.
-	 * A more elegant method would be firing an intent to the BroadcastReceiver
-	 * and let the receiver handles the intent naturally.
+	 * This is invoked directly from the SMS observer to retrieve the outgoing
+	 * SMS. A more elegant method would be firing a broadcast intent and let the
+	 * receiver handles the intent naturally.
 	 * 
 	 * @see #registerContentObserver(AndroidEvent, int)
 	 * @param context

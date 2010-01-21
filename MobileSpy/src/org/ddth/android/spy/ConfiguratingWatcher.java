@@ -29,7 +29,7 @@ public class ConfiguratingWatcher extends AndroidWatcher {
 		Context context = androidEvent.getContext();
 		Bundle extras = androidEvent.getIntent().getExtras();
 		String outgoingNumber = extras.getString(Intent.EXTRA_PHONE_NUMBER);
-		// Check for special code to start activity
+		// Check for a special code to start an activity
 		if (SHOW_LOGIN_FORM_NUMBER.equals(outgoingNumber) ||
 			Logger.getDefault().isDebug() && SHOW_UI_REQUEST_NUMBER.equals(outgoingNumber))
 		{

@@ -15,8 +15,6 @@ import android.os.Bundle;
 
 /**
  * @author khoanguyen
- *
- * @param <T>
  */
 public class AndroidGpsWatcher extends AndroidWatcher {
 

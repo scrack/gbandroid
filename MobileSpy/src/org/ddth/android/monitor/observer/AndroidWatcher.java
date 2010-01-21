@@ -6,6 +6,8 @@ import org.ddth.mobile.monitor.core.Event;
 import org.ddth.mobile.monitor.core.Observer;
 import org.ddth.mobile.monitor.core.WatcherAdapter;
 
+import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -14,9 +16,9 @@ import android.os.Parcelable;
  * It's quite intricate to serialize objects across services, activities &
  * receivers... by using built-in parceling machanism with {@link Parcelable} &
  * {@link Parcel}. Therefore, this implementation uses an object pool to host
- * all watchers and then whenever the target handlers want to pick up a correct
- * watcher, it uses {@link #hashCode()} value which is bundled in the
- * {@link Intent} extras object and look the watcher up in the object pool.<br>
+ * all watchers and then whenever the target handlers want a watcher, it uses
+ * {@link #hashCode()} value which is passed along with the {@link Intent}
+ * extras object to look up in the object pool.<br>
  * <br>
  * Normally, subclass should extend {@link #service(AndroidEvent)} callback in
  * order to handle incoming events.
@@ -34,8 +36,9 @@ public abstract class AndroidWatcher extends WatcherAdapter implements Observer 
 
 	/**
 	 * No specific implementation. Subclass may want to implement this method to
-	 * put actual event processing code here. Beware of the context of the
-	 * calling.
+	 * put actual event processing code here. Beware of the source of the event
+	 * might be from 2 different locations: either {@link BroadcastReceiver} or
+	 * {@link Service}.
 	 * 
 	 * @param dc
 	 */
@@ -47,7 +50,7 @@ public abstract class AndroidWatcher extends WatcherAdapter implements Observer 
 	 * {@inheritDoc}
 	 * <p>
 	 * Default implementation will spawn a service to handle the observation.
-	 * Subclass may want to override this method in order to modify this default
+	 * Subclass may need to override this method in order to modify this
 	 * behavior.
 	 * </p>
 	 */
