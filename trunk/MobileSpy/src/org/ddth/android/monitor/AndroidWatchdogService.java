@@ -3,7 +3,6 @@ package org.ddth.android.monitor;
 import org.ddth.android.monitor.core.AndroidEvent;
 import org.ddth.android.monitor.core.AndroidWatchdog;
 import org.ddth.android.monitor.observer.AndroidWatcher;
-import org.ddth.http.core.Logger;
 import org.ddth.mobile.monitor.core.Observer;
 import org.ddth.mobile.monitor.core.Watchdog;
 import org.ddth.mobile.monitor.core.Watcher;
@@ -55,7 +54,6 @@ public final class AndroidWatchdogService extends Service {
 			service.putExtras(extras);
 		}
 		service.putExtra(EXTRA_KEY_OBJECT_HASH_CODE, watcher.hashCode());
-		Logger.getDefault().trace("Start Android service to handle incoming event..");
 		context.startService(service);
 	}
 
@@ -79,7 +77,6 @@ public final class AndroidWatchdogService extends Service {
 			watcher.service(event);
 		}
 		else {
-			Logger.getDefault().trace("Start all watchers..");
 			// Start all watchers
 			watchdog.start(event);
 		}

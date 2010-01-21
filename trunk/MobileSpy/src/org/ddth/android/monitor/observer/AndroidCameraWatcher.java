@@ -3,7 +3,6 @@ package org.ddth.android.monitor.observer;
 import java.io.File;
 
 import org.ddth.android.monitor.core.AndroidEvent;
-import org.ddth.http.core.Logger;
 import org.ddth.mobile.monitor.core.Event;
 import org.ddth.mobile.monitor.core.Reporter;
 import org.ddth.mobile.monitor.report.Media;
@@ -73,7 +72,6 @@ public class AndroidCameraWatcher extends AndroidWatcher {
 			int mimeTypeColumn = cursor.getColumnIndexOrThrow(MediaColumns.MIME_TYPE);
 			String mimeType = cursor.getString(mimeTypeColumn);
 			media = new Media(new File(filePath), mimeType);
-			Logger.getDefault().debug(media.file.getAbsolutePath());
 		}
 		cursor.close();
 		return media;
