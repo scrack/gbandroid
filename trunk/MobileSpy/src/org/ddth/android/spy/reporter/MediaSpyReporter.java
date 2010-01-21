@@ -9,6 +9,9 @@ import org.ddth.mobile.monitor.core.Report;
 import org.ddth.mobile.monitor.report.Media;
 
 public class MediaSpyReporter extends SpyReporter {
+	/**
+	 * This is for remote storage folder name.
+	 */
 	private String username;
 	
 	public MediaSpyReporter(String username) {

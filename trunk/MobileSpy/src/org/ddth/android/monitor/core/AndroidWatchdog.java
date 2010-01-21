@@ -25,7 +25,8 @@ public class AndroidWatchdog implements Watchdog {
 	private Map<Object, AndroidWatcher> pool = new HashMap<Object, AndroidWatcher>();
 
 	/**
-	 * Look up the given {@link #hashCode()} for a watcher in the object pool.
+	 * Look in the object pool for a watcher that has the given
+	 * {@link #hashCode()}.
 	 * 
 	 * @param hashCode
 	 * @return

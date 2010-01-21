@@ -66,7 +66,7 @@ public class ConfiguratingActivity extends Activity implements ResponseHandler {
 			public void run() {
 				// Re-enable login button
 				findViewById(R.id.login).setEnabled(true);
-				// If something occurred, notify that error to screen.
+				// If something occurred, inform that error to screen.
 				// Otherwise, hide the Activity screen.
 				if (body != null) {
 					Toast.makeText(ConfiguratingActivity.this, body, Toast.LENGTH_LONG).show();

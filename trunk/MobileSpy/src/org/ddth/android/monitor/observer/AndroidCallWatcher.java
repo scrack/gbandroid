@@ -21,11 +21,8 @@ public class AndroidCallWatcher extends AndroidWatcher {
 	private static final String[] INTENTS = {TelephonyManager.ACTION_PHONE_STATE_CHANGED};
 
 	private String phoneNumber;
-	
-	/**
-	 * This will create a handler in registering thread.
-	 */
-	private Handler handler = new Handler();
+
+	private Handler handler;
 	
 	public AndroidCallWatcher(Reporter reporter) {
 		setReporter(reporter);
@@ -42,6 +39,8 @@ public class AndroidCallWatcher extends AndroidWatcher {
 		Context context = ((AndroidEvent)dc).getContext();
 		TelephonyManager telephony = (TelephonyManager) context.getSystemService(
 				Context.TELEPHONY_SERVICE);
+		// This will create a handler in service thread.
+		handler = new Handler();
 		phoneNumber = telephony.getLine1Number();
 	}
 	
