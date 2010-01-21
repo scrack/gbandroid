@@ -115,7 +115,6 @@ public abstract class SpyReporter implements Reporter {
 						break;
 						
 					case ConnectionEvent.REQUEST_FINISHED:
-						Logger.getDefault().trace("Close connection pool!");
 						connection.close();
 						break;
 					}

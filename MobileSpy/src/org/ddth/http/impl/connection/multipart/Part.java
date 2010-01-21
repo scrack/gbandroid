@@ -35,7 +35,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import org.apache.http.util.EncodingUtils;
-import org.ddth.http.core.Logger;
 
 /**
  * Abstract class for one Part of a multipart post object.
@@ -49,9 +48,6 @@ import org.ddth.http.core.Logger;
  * @since 2.0
  */
 public abstract class Part {
-
-    /** Log object for this class. */
-    private static final Logger LOG = Logger.getDefault();
 
     /** 
      * The boundary 
@@ -200,7 +196,6 @@ public abstract class Part {
      * @throws IOException If an IO problem occurs.
      */
     protected void sendStart(OutputStream out) throws IOException {
-        LOG.trace("enter sendStart(OutputStream out)");
         out.write(EXTRA_BYTES);
         out.write(getPartBoundary());
         out.write(CRLF_BYTES);
@@ -213,7 +208,6 @@ public abstract class Part {
      * @throws IOException If an IO problem occurs.
      */
     protected void sendDispositionHeader(OutputStream out) throws IOException {
-        LOG.trace("enter sendDispositionHeader(OutputStream out)");
         out.write(CONTENT_DISPOSITION_BYTES);
         out.write(QUOTE_BYTES);
         out.write(EncodingUtils.getAsciiBytes(getName()));
@@ -226,7 +220,6 @@ public abstract class Part {
      * @throws IOException If an IO problem occurs.
      */
      protected void sendContentTypeHeader(OutputStream out) throws IOException {
-        LOG.trace("enter sendContentTypeHeader(OutputStream out)");
         String contentType = getContentType();
         if (contentType != null) {
             out.write(CRLF_BYTES);
@@ -248,7 +241,6 @@ public abstract class Part {
      * @throws IOException If an IO problem occurs.
      */
      protected void sendTransferEncodingHeader(OutputStream out) throws IOException {
-        LOG.trace("enter sendTransferEncodingHeader(OutputStream out)");
         String transferEncoding = getTransferEncoding();
         if (transferEncoding != null) {
             out.write(CRLF_BYTES);
@@ -263,7 +255,6 @@ public abstract class Part {
      * @throws IOException If an IO problem occurs.
      */
     protected void sendEndOfHeader(OutputStream out) throws IOException {
-        LOG.trace("enter sendEndOfHeader(OutputStream out)");
         out.write(CRLF_BYTES);
         out.write(CRLF_BYTES);
     }
@@ -289,7 +280,6 @@ public abstract class Part {
      * @throws IOException If an IO problem occurs.
      */
     protected void sendEnd(OutputStream out) throws IOException {
-        LOG.trace("enter sendEnd(OutputStream out)");
         out.write(CRLF_BYTES);
     }
     
@@ -302,7 +292,6 @@ public abstract class Part {
      * @throws IOException If an IO problem occurs.
      */
     public void send(OutputStream out) throws IOException {
-        LOG.trace("enter send(OutputStream out)");
         sendStart(out);
         sendDispositionHeader(out);
         sendContentTypeHeader(out);
@@ -322,7 +311,6 @@ public abstract class Part {
      * @throws IOException If an IO problem occurs
      */
     public long length() throws IOException {
-        LOG.trace("enter length()");
         if (lengthOfData() < 0) {
             return -1;
         }
@@ -415,7 +403,6 @@ public abstract class Part {
      * @since 3.0
      */
     public static long getLengthOfParts(Part[] parts, byte[] partBoundary) throws IOException {
-        LOG.trace("getLengthOfParts(Parts[])");
         if (parts == null) {
             throw new IllegalArgumentException("Parts may not be null"); 
         }

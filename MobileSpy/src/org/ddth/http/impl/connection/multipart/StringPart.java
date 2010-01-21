@@ -34,7 +34,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import org.apache.http.util.EncodingUtils;
-import org.ddth.http.core.Logger;
 
 /**
  * Simple string parameter for a multipart post
@@ -47,9 +46,6 @@ import org.ddth.http.core.Logger;
  * @since 2.0
  */
 public class StringPart extends PartBase {
-
-    /** Log object for this class. */
-    private static final Logger LOG = Logger.getDefault();
 
     /** Default content encoding of string parameters. */
     public static final String DEFAULT_CONTENT_TYPE = "text/plain";
@@ -122,7 +118,6 @@ public class StringPart extends PartBase {
      */
     @Override
     protected void sendData(OutputStream out) throws IOException {
-        LOG.trace("enter sendData(OutputStream)");
         out.write(getContent());
     }
     
@@ -133,7 +128,6 @@ public class StringPart extends PartBase {
      */
     @Override
     protected long lengthOfData() {
-        LOG.trace("enter lengthOfData()");
         return getContent().length;
     }
     

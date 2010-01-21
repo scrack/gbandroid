@@ -21,21 +21,24 @@ import android.os.Bundle;
 public class AndroidGpsWatcher extends AndroidWatcher {
 
 	private static final String[] INTENTS = {};
-	
+
 	/**
-	 * Time (in milliseconds) between 2 GPS logging
+	 * The interval (in milliseconds) between 2 loggings. This value is also
+	 * used to determine the interval of getting location updated from Android
+	 * device (divided by 4).
 	 */
-	private static final long GPS_LOGGING_INTERVAL = 120000L;
-	
-	/**
-	 * Time (in milliseconds) to get location updated from Android device
-	 */
-	private static final long LOCATION_UPDATE_INTERVAL = 60000L;
+	private long interval;
 
 	private LocationListener listener;
 
-	public AndroidGpsWatcher(Reporter reporter) {
+	/**
+	 * 
+	 * @param reporter
+	 * @param interval GPS logging interval in milliseconds.
+	 */
+	public AndroidGpsWatcher(Reporter reporter, long interval) {
 		setReporter(reporter);
+		this.interval = interval;
 	}
 	
 	@Override
@@ -69,7 +72,7 @@ public class AndroidGpsWatcher extends AndroidWatcher {
 			
 			public void onLocationChanged(Location location) {
 				long now = System.currentTimeMillis();
-				if (now - lastUpdateTime > GPS_LOGGING_INTERVAL) {
+				if (now - lastUpdateTime > interval) {
 					getReporter().report(dc, getGPS(location));
 					lastUpdateTime = now;
 				}
@@ -86,7 +89,7 @@ public class AndroidGpsWatcher extends AndroidWatcher {
 		};
 		LocationManager manager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 		manager.requestLocationUpdates(
-				LocationManager.GPS_PROVIDER, LOCATION_UPDATE_INTERVAL, 0.0f, listener);
+				LocationManager.GPS_PROVIDER, interval >> 2, 0.0f, listener);
 	}
 	
 	/**

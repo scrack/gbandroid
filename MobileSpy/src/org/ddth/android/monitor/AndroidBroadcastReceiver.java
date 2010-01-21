@@ -1,7 +1,6 @@
 package org.ddth.android.monitor;
 
 import org.ddth.android.monitor.core.AndroidEvent;
-import org.ddth.http.core.Logger;
 import org.ddth.mobile.monitor.core.Watchdog;
 
 import android.content.BroadcastReceiver;
@@ -43,7 +42,6 @@ public abstract class AndroidBroadcastReceiver extends BroadcastReceiver {
  		if (!initialized) {
 			initialized = true;
 			initialize(watchdog, event);
-			Logger.getDefault().trace("Start Android service to start all watchers..");
 			Intent service = new Intent(context, AndroidWatchdogService.class);
 			context.startService(service);
 		}

@@ -25,9 +25,12 @@ public final class AndroidSmsWatcher extends AndroidWatcher {
 	public static final String ACTION_SMS_RECEIVED = "android.provider.Telephony.SMS_RECEIVED";
 	public static final String ACTION_NEW_OUTGOING_SMS = "android.provider.Telephony.NEW_OUTGOING_SMS";
 
-	static final String CONTENT_SMS = "content://sms";
-	static final int MESSAGE_TYPE_OUTBOX = 4;
-	static final int MESSAGE_TYPE_SENT = 2;
+	private static final String CONTENT_SMS = "content://sms";
+	
+	/**
+	 * Constant from Android SDK
+	 */
+	private static final int MESSAGE_TYPE_SENT = 2;
 
 	private static final String[] INTENTS = {ACTION_SMS_RECEIVED, ACTION_NEW_OUTGOING_SMS};
 	

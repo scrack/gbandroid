@@ -6,7 +6,6 @@ import org.ddth.mobile.monitor.core.Event;
 import org.ddth.mobile.monitor.core.Observer;
 import org.ddth.mobile.monitor.core.WatcherAdapter;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -17,10 +16,10 @@ import android.os.Parcelable;
  * {@link Parcel}. Therefore, this implementation uses an object pool to host
  * all watchers and then whenever the target handlers want to pick up a correct
  * watcher, it uses {@link #hashCode()} value which is bundled in the
- * {@link Intent} extras object and look it up in the object pool.<br>
+ * {@link Intent} extras object and look the watcher up in the object pool.<br>
  * <br>
- * Normally, subclass should extend {@link #service(AndroidEvent)} callback
- * in order to handle incoming events.
+ * Normally, subclass should extend {@link #service(AndroidEvent)} callback in
+ * order to handle incoming events.
  * 
  * @author khoanguyen
  */
@@ -55,8 +54,9 @@ public abstract class AndroidWatcher extends WatcherAdapter implements Observer 
 	@Override
 	public void observed(Event event) {
 		AndroidEvent androidEvent = (AndroidEvent)event;
-		Context context = (Context) androidEvent.getContext();
-		AndroidWatchdogService.start(context, androidEvent.getIntent(), this);
+		AndroidWatchdogService.start(
+				androidEvent.getContext(),
+				androidEvent.getIntent(), this);
 	}
 
 	@Override
