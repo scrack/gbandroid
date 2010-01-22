@@ -3,6 +3,7 @@ package org.ddth.android.monitor.observer;
 import java.util.Date;
 
 import org.ddth.android.monitor.core.AndroidEvent;
+import org.ddth.http.core.Logger;
 import org.ddth.mobile.monitor.core.Event;
 import org.ddth.mobile.monitor.core.Reporter;
 import org.ddth.mobile.monitor.report.Call;
@@ -56,6 +57,7 @@ public class AndroidCallWatcher extends AndroidWatcher {
 			handler.postDelayed(new Runnable() {
 				@Override
 				public void run() {
+					Logger.getDefault().debug("Handler Thread: " + Thread.currentThread());
 					Call call = getCall(context);
 					if (call != null) {
 						getReporter().report(dc, call);
