@@ -3,8 +3,6 @@ package org.ddth.android.monitor;
 import org.ddth.android.monitor.core.AndroidEvent;
 import org.ddth.android.monitor.core.AndroidWatchdog;
 import org.ddth.android.monitor.observer.AndroidWatcher;
-import org.ddth.mobile.monitor.core.Observer;
-import org.ddth.mobile.monitor.core.Watchdog;
 import org.ddth.mobile.monitor.core.Watcher;
 
 import android.app.Service;
@@ -34,20 +32,6 @@ public final class AndroidWatchdogService extends Service {
 	private static final String EXTRA_KEY_OBJECT_HASH_CODE = "object.hashcode";
 
 	/**
-	 * A {@link Watchdog} may be accessed from multiple places for retrieving
-	 * {@link Observer} objects. Because object sharing in Android is very very
-	 * complex, we have no choice but keeping a <b>static</b> variable here.
-	 * Actually, there is only one instance of any service in an Android process
-	 * at a time, and thus we could put this {@link #watchdog} object there but
-	 * it isn't wise to do so.
-	 */
-	private static AndroidWatchdog watchdog = new AndroidWatchdog();
-
-	public static Watchdog getWatchdog() {
-		return watchdog;
-	}
-
-	/**
 	 * Start the watchdog service to handle this event.
 	 * 
 	 * @param context
@@ -75,6 +59,7 @@ public final class AndroidWatchdogService extends Service {
 		AndroidEvent event = new AndroidEvent(this, this, intent);
 		Bundle extras = intent.getExtras();
 		Object key = extras != null ? extras.get(EXTRA_KEY_OBJECT_HASH_CODE) : null;
+		AndroidWatchdog watchdog = ((AndroidMonitorApplication) getApplication()).getWatchdog();
 		if (key != null) {
 			// The service looks up the appropriate watcher by using
 			// information in the given intent and then delegate the
