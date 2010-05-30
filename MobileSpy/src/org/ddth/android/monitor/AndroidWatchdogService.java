@@ -13,8 +13,8 @@ import android.os.IBinder;
 
 /**
  * This Android service is spawned when an {@link AndroidWatcher} want to
- * execute its processing in a service. Therefore, client must register this
- * service to the Application node in the AndroidManifest.xml file.
+ * execute its processing in a service. Therefore, developers must register
+ * this service to the Application node in the AndroidManifest.xml file.
  * <p>
  * &lt;service android:name="org.ddth.android.monitor.AndroidWatchdogService"
  * /&gt;
@@ -22,9 +22,10 @@ import android.os.IBinder;
  * There are only 2 types of invocation of this service. One is in the receiver
  * initialization and one is when an interested event occurs. The first one
  * allows all the registered watchers to start running (monitoring) whereas the
- * second one is caused by a watcher that delegates the event processing from
- * short-live broadcast receiver to a long-running service. Please noted that
- * the watcher object is only available in the second one.
+ * second one is triggered by a watcher to delegate the event processing from
+ * a short-live broadcast receiver to a long-running service. Please noted that
+ * the watcher object is only available in the second one and we can retrieve it
+ * in the intent extra/bundle.
  * 
  * @author khoanguyen
  */
@@ -62,7 +63,7 @@ public final class AndroidWatchdogService extends Service {
 		AndroidWatchdog watchdog = ((AndroidMonitorApplication) getApplication()).getWatchdog();
 		if (key != null) {
 			// The service looks up the appropriate watcher by using
-			// information in the given intent and then delegate the
+			// information in the given intent and delegating the
 			// processing to this watcher.
 			AndroidWatcher watcher = watchdog.getWatcher((Integer) key);
 			watcher.service(event);

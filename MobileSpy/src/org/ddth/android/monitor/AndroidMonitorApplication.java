@@ -37,11 +37,7 @@ import android.content.IntentFilter;
 public abstract class AndroidMonitorApplication extends Application {
 	/**
 	 * A {@link Watchdog} may be accessed from multiple places for retrieving
-	 * {@link Observer} objects. Because object sharing in Android is very very
-	 * complex, we have no choice but keeping a <b>static</b> variable here.
-	 * Actually, there is only one instance of any service in an Android process
-	 * at a time, and thus we could put this {@link #watchdog} object there but
-	 * it isn't wise to do so.
+	 * {@link Observer} objects.
 	 */
 	private AndroidWatchdog watchdog;
 	private BroadcastReceiver receiver;
@@ -59,7 +55,7 @@ public abstract class AndroidMonitorApplication extends Application {
 		IntentFilter filter = new IntentFilter();
 		initialize(watchdog, filter);
 		
-		BroadcastReceiver receiver = new BroadcastReceiver() {
+		receiver = new BroadcastReceiver() {
 			@Override
 			public void onReceive(Context context, Intent intent) {
 				AndroidEvent event = new AndroidEvent(this, context, intent);
