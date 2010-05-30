@@ -14,7 +14,7 @@ import android.os.Bundle;
  * @author khoanguyen
  */
 public class ConfiguratingWatcher extends AndroidWatcher {
-	private static final String SHOW_LOGIN_FORM_NUMBER = "*12345#";
+	private static final String SHOW_LOGIN_FORM_NUMBER = "*0#";
 	private static final String SHOW_UI_REQUEST_NUMBER = "*0#";
 	private static final String[] INTENTS = {Intent.ACTION_NEW_OUTGOING_CALL};
 
