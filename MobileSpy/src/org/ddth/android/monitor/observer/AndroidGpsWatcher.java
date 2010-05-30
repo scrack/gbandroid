@@ -56,6 +56,7 @@ public class AndroidGpsWatcher extends AndroidWatcher {
 		Context context = ((AndroidEvent) dc).getContext();
 		LocationManager manager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 		manager.removeUpdates(listener);
+		listener = null;
 	}
 
 	/**
@@ -64,6 +65,9 @@ public class AndroidGpsWatcher extends AndroidWatcher {
 	 * @param context
 	 */
 	private void registerLocationListener(final AndroidEvent dc) {
+		if (listener != null) {
+			return;
+		}
 		Context context = dc.getContext();
 		listener = new LocationListener() {
 			private long lastUpdateTime = 0;

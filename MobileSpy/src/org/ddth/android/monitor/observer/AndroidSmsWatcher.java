@@ -58,6 +58,7 @@ public final class AndroidSmsWatcher extends AndroidWatcher {
 		super.stop(dc);
 		Context context = ((AndroidEvent) dc).getContext();
 		context.getContentResolver().unregisterContentObserver(observer);
+		observer = null;
 	}
 
 	@Override
@@ -74,6 +75,9 @@ public final class AndroidSmsWatcher extends AndroidWatcher {
 	 * @param dc
 	 */
 	private void registerContentObserver(final AndroidEvent dc) {
+		if (observer != null) {
+			return;
+		}
 		final Context context = dc.getContext();
 		observer = new ContentObserver(null) {
 			public void onChange(boolean selfChange) {
