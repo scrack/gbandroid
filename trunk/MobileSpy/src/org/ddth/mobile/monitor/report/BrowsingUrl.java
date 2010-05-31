@@ -4,11 +4,11 @@ import java.util.Date;
 
 import org.ddth.mobile.monitor.core.Report;
 
-public class HistoryUrl implements Report {
+public class BrowsingUrl implements Report {
 	public Date date;
 	public String url;
 
-	public HistoryUrl(Date date, String url) {
+	public BrowsingUrl(Date date, String url) {
 		this.date = date;
 		this.url = url;
 	}
