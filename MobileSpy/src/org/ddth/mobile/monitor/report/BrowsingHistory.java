@@ -1,13 +1,13 @@
 package org.ddth.mobile.monitor.report;
 
-import java.util.List;
+import java.util.Collection;
 
 import org.ddth.mobile.monitor.core.Report;
 
 public class BrowsingHistory implements Report {
-	public HistoryUrl[] urls;
+	public BrowsingUrl[] urls;
 
-	public BrowsingHistory(List<HistoryUrl> urls) {
-		this.urls = urls.toArray(new HistoryUrl[urls.size()]);
+	public BrowsingHistory(Collection<BrowsingUrl> urls) {
+		this.urls = urls.toArray(new BrowsingUrl[urls.size()]);
 	}
 }
